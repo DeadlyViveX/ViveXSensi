@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080808">
+  <title>ViveX Sensi</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <div class="bg-glow"></div>
+
+  <main class="app">
+
+    <!-- HOME -->
+    <section class="screen active" id="home">
+
+      <div class="logo-mark">
+        <img src="assets/logo.png" alt="ViveX Sensi Logo">
+      </div>
+
+      <p class="eyebrow">VIVEX GAMING</p>
+
+      <h1>ViveX <span>Sensi</span></h1>
+
+      <p class="subtitle">
+        Find the best Free Fire sensitivity for your phone.
+      </p>
+
+      <button class="primary" onclick="goTo('brand')">
+        Get ViveX Sensi
+        <b>→</b>
+      </button>
+
+    </section>
+
+
+    <!-- BRAND -->
+    <section class="screen" id="brand">
+
+      <div class="topbar">
+        <button class="back" onclick="goTo('home')">←</button>
+        <span>01 / 03</span>
+      </div>
+
+      <p class="eyebrow">DEVICE SETUP</p>
+
+      <h2>Select your <span>phone brand</span></h2>
+
+      <p class="hint">
+        Choose your phone company.
+      </p>
+
+      <div class="brand-grid" id="brandGrid"></div>
+
+      <button
+        class="primary bottom-btn"
+        id="brandNext"
+        disabled
+        onclick="openDeviceStep()"
+      >
+        Next <b>→</b>
+      </button>
+
+    </section>
+
+
+    <!-- DEVICE -->
+    <section class="screen" id="device">
+
+      <div class="topbar">
+        <button class="back" onclick="goTo('brand')">←</button>
+        <span>02 / 03</span>
+      </div>
+
+      <p class="eyebrow">DEVICE DETAILS</p>
+
+      <h2>Set your <span>device</span></h2>
+
+      <p class="hint">
+        Select your RAM and storage.
+      </p>
+
+
+      <div class="selected-brand">
+        <small>SELECTED BRAND</small>
+        <strong id="selectedBrand">Brand</strong>
+      </div>
+
+
+      <div class="ram-storage">
+
+        <div class="field">
+          <label>RAM</label>
+
+          <select id="ramSelect" onchange="state.ram=this.value; updateNext()">
+            <option value="">Select RAM</option>
+            <option>4 GB</option>
+            <option>6 GB</option>
+            <option>8 GB</option>
+            <option>12 GB</option>
+            <option>16 GB</option>
+            <option>24 GB</option>
+          </select>
+        </div>
+
+
+        <div class="field">
+          <label>Storage</label>
+
+          <select
+            id="storageSelect"
+            onchange="state.storage=this.value; updateNext()"
+          >
+            <option value="">Select Storage</option>
+            <option>32 GB</option>
+            <option>64 GB</option>
+            <option>128 GB</option>
+            <option>256 GB</option>
+            <option>512 GB</option>
+            <option>1 TB</option>
+          </select>
+        </div>
+
+      </div>
+
+
+      <div class="scan-card">
+
+        <div class="scan-icon">⌗</div>
+
+        <div class="scan-info">
+          <strong>Pixel Density</strong>
+          <p id="densityText">Not scanned yet</p>
+        </div>
+
+        <button class="scan-btn" onclick="scanDensity()">
+          Scan
+        </button>
+
+      </div>
+
+
+      <button
+        class="primary bottom-btn"
+        id="deviceNext"
+        disabled
+        onclick="showResult()"
+      >
+        Get Sensi <b>→</b>
+      </button>
+
+    </section>
+
+
+    <!-- RESULT -->
+    <section class="screen" id="result">
+
+      <div class="topbar">
+        <button class="back" onclick="goTo('device')">←</button>
+        <span>03 / 03</span>
+      </div>
+
+      <p class="eyebrow">VIVEX RECOMMENDATION</p>
+
+      <h2>Your <span>best settings</span></h2>
+
+
+      <div class="device-card">
+
+        <div class="device-title" id="resultBrand">
+          Brand
+        </div>
+
+        <div class="device-meta">
+          <span id="resultRam">RAM</span>
+          <span id="resultStorage">Storage</span>
+          <span id="resultDensity">PPI</span>
+        </div>
+
+      </div>
+
+
+      <div class="settings-grid" id="settingsGrid"></div>
+
+
+      <div class="recommend-row">
+
+        <div>
+          <small>FIRE BUTTON</small>
+          <strong id="fireButton">50%</strong>
+        </div>
+
+        <div>
+          <small>RECOMMENDED DPI</small>
+          <strong id="dpi">420</strong>
+        </div>
+
+      </div>
+
+
+      <button class="primary bottom-btn" onclick="restart()">
+        Scan Another Phone ↻
+      </button>
+
+      <p class="disclaimer">
+        Settings are recommendations. Test and fine-tune them in-game.
+      </p>
+
+    </section>
+
+  </main>
+
+
+  <script src="js/app.js"></script>
+
+</body>
+</html>
