@@ -752,3 +752,44 @@ select:focus{
   }
 
 }
+
+.social-buttons{
+  width:100%;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+
+.social-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:13px 10px;
+  border-radius:13px;
+  background:#101010;
+  border:1px solid #252525;
+  color:#fff;
+  text-decoration:none;
+  font-size:13px;
+  font-weight:800;
+  transition:.2s;
+}
+
+.social-btn span{
+  font-size:17px;
+}
+
+.social-btn:hover{
+  transform:translateY(-2px);
+  border-color:#444;
+}
+
+.social-btn.youtube:hover,
+.social-btn.instagram:hover{
+  border-color:#ff1f32;
+  background:#17090b;
+}
+
+}
