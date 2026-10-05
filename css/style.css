@@ -15,9 +15,9 @@
 }
 
 html{
-  scroll-behavior:smooth;
   width:100%;
-  height:100%;
+  min-height:100%;
+  scroll-behavior:smooth;
 }
 
 body{
@@ -25,13 +25,12 @@ body{
   background:var(--bg);
   color:var(--white);
   width:100%;
-  height:100%;
   min-height:100%;
-  overflow:hidden;
+  overflow-x:hidden;
 }
 
 
-/* BACKGROUND GLOW */
+/* BACKGROUND */
 
 .bg-glow{
   position:fixed;
@@ -56,23 +55,19 @@ body{
   z-index:1;
   width:100%;
   max-width:520px;
-  height:100dvh;
-  min-height:0;
+  min-height:100dvh;
   margin:auto;
-  padding:18px 22px 12px;
-  overflow:hidden;
+  padding:16px 22px 12px;
 }
 
 
-/* SCREENS */
+/* SCREEN */
 
 .screen{
   display:none;
   width:100%;
-  height:100%;
-  min-height:0;
+  min-height:calc(100dvh - 28px);
   flex-direction:column;
-  overflow:hidden;
   animation:fade .25s ease;
 }
 
@@ -111,7 +106,6 @@ body{
   box-shadow:0 0 40px rgba(255,31,50,.25);
   margin-bottom:25px;
   padding:6px;
-  flex-shrink:0;
 }
 
 .logo-mark img{
@@ -179,7 +173,6 @@ h2{
   cursor:pointer;
   box-shadow:0 10px 30px rgba(255,31,50,.18);
   transition:.2s;
-  flex-shrink:0;
 }
 
 .primary:hover{
@@ -197,6 +190,9 @@ h2{
   font-size:20px;
 }
 
+
+/* BOTTOM BUTTON */
+
 .bottom-btn{
   margin-top:auto;
   margin-bottom:4px;
@@ -210,7 +206,7 @@ h2{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  margin-bottom:38px;
+  margin-bottom:32px;
   color:#666;
   font-size:11px;
   font-weight:800;
@@ -227,7 +223,6 @@ h2{
   border-radius:12px;
   font-size:20px;
   cursor:pointer;
-  flex-shrink:0;
 }
 
 
@@ -237,15 +232,14 @@ h2{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:11px;
-  margin-top:25px;
-  overflow:hidden;
+  margin-top:22px;
 }
 
 .brand{
   background:var(--card);
   border:1px solid var(--line);
   color:#ddd;
-  padding:15px;
+  padding:16px;
   border-radius:14px;
   text-align:left;
   font-weight:700;
@@ -275,8 +269,7 @@ h2{
   border:1px solid #48131a;
   border-radius:14px;
   padding:15px;
-  margin-top:25px;
-  flex-shrink:0;
+  margin-top:22px;
 }
 
 .selected-brand small{
@@ -298,7 +291,6 @@ h2{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12px;
-  flex-shrink:0;
 }
 
 .field{
@@ -340,7 +332,6 @@ select:focus{
   border-radius:15px;
   padding:14px;
   margin-top:20px;
-  flex-shrink:0;
 }
 
 .scan-icon{
@@ -396,8 +387,7 @@ select:focus{
   border:1px solid #292929;
   border-radius:17px;
   padding:18px;
-  margin:20px 0 14px;
-  flex-shrink:0;
+  margin:22px 0 14px;
 }
 
 .device-title{
@@ -427,13 +417,12 @@ select:focus{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
-  flex-shrink:0;
 }
 
 .setting{
   background:#101010;
   border:1px solid var(--line);
-  padding:13px;
+  padding:14px;
   border-radius:13px;
 }
 
@@ -447,7 +436,7 @@ select:focus{
 }
 
 .setting strong{
-  font-size:25px;
+  font-size:27px;
   color:#fff;
   display:block;
   margin-top:4px;
@@ -461,13 +450,12 @@ select:focus{
   grid-template-columns:1fr 1fr;
   gap:10px;
   margin-top:10px;
-  flex-shrink:0;
 }
 
 .recommend-row>div{
   background:#19090b;
   border:1px solid #48131a;
-  padding:14px;
+  padding:15px;
   border-radius:13px;
 }
 
@@ -485,86 +473,189 @@ select:focus{
   font-size:10px;
   color:#555;
   text-align:center;
-  margin:10px 0 2px;
+  margin:10px 0 4px;
   line-height:1.5;
-  flex-shrink:0;
 }
 
 
-/* MOBILE */
+/* =================================
+   MOBILE
+================================= */
 
 @media(max-width:599px){
 
-  html,
+  html{
+    width:100%;
+    min-height:100%;
+  }
+
   body{
     width:100%;
-    height:100%;
-    overflow:hidden;
+    min-height:100%;
+    overflow-x:hidden;
   }
 
   .app{
     width:100%;
-    height:100dvh;
-    max-height:100dvh;
-    min-height:0;
-    padding:18px 22px 12px;
-    overflow:hidden;
+    max-width:520px;
+    min-height:100dvh;
+    padding:12px 18px 8px;
   }
 
   .screen{
     width:100%;
-    height:100%;
-    max-height:100%;
-    min-height:0;
-    overflow:hidden;
+    min-height:calc(100dvh - 20px);
+    overflow:visible;
+  }
+
+
+  /* TOP BAR */
+
+  .topbar{
+    margin-bottom:22px;
+  }
+
+
+  /* HEADINGS */
+
+  .eyebrow{
+    font-size:10px;
+    letter-spacing:3px;
+    margin-bottom:8px;
   }
 
   h2{
-    font-size:30px;
+    font-size:28px;
+    line-height:1.05;
+    margin-bottom:8px;
   }
 
-}
-
-
-/* SMALL PHONES */
-
-@media(max-height:700px){
-
-  .app{
-    padding-top:12px;
-    padding-bottom:8px;
+  .hint{
+    font-size:14px;
+    line-height:1.45;
   }
 
-  .topbar{
-    margin-bottom:25px;
+
+  /* HOME */
+
+  #home{
+    min-height:calc(100dvh - 20px);
   }
+
+  .logo-mark{
+    width:92px;
+    height:92px;
+    margin-bottom:22px;
+  }
+
+  h1{
+    font-size:42px;
+  }
+
+  .subtitle{
+    font-size:14px;
+    margin:16px auto 26px;
+  }
+
+
+  /* BRAND */
+
+  .brand-grid{
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-top:17px;
+  }
+
+  .brand{
+    min-height:49px;
+    padding:11px 5px;
+    border-radius:12px;
+    font-size:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+  }
+
+  .bottom-btn{
+    margin-top:18px;
+    margin-bottom:3px;
+  }
+
+
+  /* DEVICE */
 
   .selected-brand{
-    margin-top:18px;
+    margin-top:17px;
+    padding:13px;
+  }
+
+  .selected-brand strong{
+    font-size:19px;
+  }
+
+  .ram-storage{
+    gap:10px;
   }
 
   .field{
     margin-top:14px;
   }
 
-  .scan-card{
-    margin-top:14px;
+  .field label{
+    font-size:11px;
+    margin-bottom:7px;
   }
 
+  select{
+    padding:14px 12px;
+    font-size:14px;
+  }
+
+  .scan-card{
+    margin-top:15px;
+    padding:12px;
+  }
+
+  .scan-icon{
+    width:40px;
+    height:40px;
+  }
+
+  .scan-btn{
+    padding:10px 13px;
+  }
+
+
+  /* RESULT */
+
   .device-card{
-    margin-top:14px;
+    margin-top:15px;
+    padding:14px;
+  }
+
+  .device-title{
+    font-size:19px;
+  }
+
+  .settings-grid{
+    gap:8px;
   }
 
   .setting{
-    padding:10px;
+    padding:11px;
   }
 
   .setting strong{
-    font-size:22px;
+    font-size:23px;
+  }
+
+  .recommend-row{
+    gap:8px;
   }
 
   .recommend-row>div{
-    padding:11px;
+    padding:12px;
   }
 
   .recommend-row strong{
@@ -572,13 +663,82 @@ select:focus{
   }
 
   .disclaimer{
-    margin-top:6px;
+    margin-top:7px;
   }
 
 }
 
 
-/* DESKTOP */
+/* =================================
+   SMALL HEIGHT PHONES
+================================= */
+
+@media(max-width:599px) and (max-height:750px){
+
+  .app{
+    padding-top:9px;
+    padding-bottom:6px;
+  }
+
+  .topbar{
+    margin-bottom:17px;
+  }
+
+  h2{
+    font-size:26px;
+  }
+
+  .brand-grid{
+    margin-top:14px;
+    gap:6px;
+  }
+
+  .brand{
+    min-height:45px;
+    padding:9px 4px;
+    font-size:11px;
+  }
+
+  .selected-brand{
+    margin-top:13px;
+    padding:11px;
+  }
+
+  .field{
+    margin-top:11px;
+  }
+
+  select{
+    padding:12px;
+  }
+
+  .scan-card{
+    margin-top:12px;
+    padding:10px;
+  }
+
+  .setting{
+    padding:9px;
+  }
+
+  .setting strong{
+    font-size:21px;
+  }
+
+  .recommend-row>div{
+    padding:9px;
+  }
+
+  .recommend-row strong{
+    font-size:20px;
+  }
+
+}
+
+
+/* =================================
+   DESKTOP
+================================= */
 
 @media(min-width:600px){
 
