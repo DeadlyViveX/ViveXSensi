@@ -2,9 +2,11 @@ const state = {
   brand: "",
   ram: "",
   storage: "",
-  density: 0
+  density: 0,
+  screenWidth: 0,
+  screenHeight: 0,
+  dpr: 1
 };
-
 
 const $ = (id) => document.getElementById(id);
 
@@ -30,9 +32,30 @@ const BRANDS = [
 ];
 
 
+/* BRAND TUNING */
+
+const BRAND_FACTOR = {
+  "Samsung": 0,
+  "Realme": 4,
+  "Vivo": 3,
+  "OPPO": 2,
+  "Xiaomi": 4,
+  "OnePlus": 5,
+  "Motorola": 1,
+  "Infinix": 6,
+  "Tecno": 6,
+  "iQOO": 7,
+  "Apple": -4,
+  "POCO": 5,
+  "Nothing": 2,
+  "Honor": 1,
+  "Google Pixel": -2
+};
+
+
 /* PAGE NAVIGATION */
 
-function goTo(id){
+function goTo(id) {
 
   document
     .querySelectorAll(".screen")
@@ -43,15 +66,15 @@ function goTo(id){
   $(id).classList.add("active");
 
   window.scrollTo({
-    top:0,
-    behavior:"smooth"
+    top: 0,
+    behavior: "smooth"
   });
 }
 
 
 /* LOAD BRANDS */
 
-function init(){
+function init() {
 
   $("brandGrid").innerHTML = BRANDS
     .map((brand) => `
@@ -68,7 +91,7 @@ function init(){
 
 /* SELECT BRAND */
 
-function selectBrand(brand, element){
+function selectBrand(brand, element) {
 
   state.brand = brand;
 
@@ -84,9 +107,9 @@ function selectBrand(brand, element){
 }
 
 
-/* OPEN RAM/STORAGE PAGE */
+/* OPEN DEVICE PAGE */
 
-function openDeviceStep(){
+function openDeviceStep() {
 
   $("selectedBrand").textContent = state.brand;
 
@@ -96,6 +119,9 @@ function openDeviceStep(){
   state.ram = "";
   state.storage = "";
   state.density = 0;
+  state.screenWidth = 0;
+  state.screenHeight = 0;
+  state.dpr = 1;
 
   $("densityText").textContent =
     "Not scanned yet";
@@ -106,45 +132,52 @@ function openDeviceStep(){
 }
 
 
-/* PIXEL DENSITY SCAN */
+/* PIXEL DENSITY / SCREEN SCAN */
 
-function scanDensity(){
+function scanDensity() {
 
   const dpr =
     window.devicePixelRatio || 1;
 
-  /*
-    Browser Android ka real system DPI
-    reliably nahi de sakta.
+  const width =
+    Math.round(
+      window.screen.width * dpr
+    );
 
-    Isliye screen DPR se estimated PPI
-    calculate kiya ja raha hai.
+  const height =
+    Math.round(
+      window.screen.height * dpr
+    );
+
+  /*
+    Browser se exact Android system DPI
+    reliably detect nahi hota.
+
+    Isliye DPR se estimated PPI banaya
+    ja raha hai.
   */
 
   const ppi =
     Math.round(160 * dpr);
 
-  const width =
-    Math.round(window.screen.width * dpr);
-
-  const height =
-    Math.round(window.screen.height * dpr);
-
 
   state.density = ppi;
+  state.screenWidth = width;
+  state.screenHeight = height;
+  state.dpr = dpr;
 
 
   $("densityText").textContent =
-    `Detected • ${width} × ${height} • ~${ppi} PPI`;
+    `Detected • ${width} × ${height} • ${dpr}x • ~${ppi} PPI`;
 
 
   updateNext();
 }
 
 
-/* NEXT BUTTON CHECK */
+/* CHECK NEXT BUTTON */
 
-function updateNext(){
+function updateNext() {
 
   $("deviceNext").disabled = !(
     state.ram &&
@@ -154,93 +187,220 @@ function updateNext(){
 }
 
 
-/* RAM NUMBER */
+/* RAM */
 
-function getRam(){
+function getRam() {
 
   return parseInt(state.ram) || 4;
 
 }
 
 
-/* CREATE SENSITIVITY */
+/* STORAGE */
 
-function generateSensitivity(){
+function getStorage() {
 
-  const ram = getRam();
+  const value =
+    state.storage
+      .replace(" GB", "")
+      .replace(" TB", "");
+
+  if (state.storage.includes("TB")) {
+    return parseFloat(value) * 1024;
+  }
+
+  return parseInt(value) || 64;
+}
+
+
+/* DEVICE SCORE */
+
+function getDeviceScore() {
+
+  const ram =
+    getRam();
+
+  const storage =
+    getStorage();
 
   const ppi =
     state.density || 320;
 
+  const dpr =
+    state.dpr || 1;
+
 
   /*
-    Base sensitivity.
+    Screen resolution score
+  */
 
-    Free Fire sensitivity:
+  const pixels =
+    state.screenWidth *
+    state.screenHeight;
+
+
+  const resolutionScore =
+    Math.min(
+      20,
+      pixels / 180000
+    );
+
+
+  /*
+    PPI score
+  */
+
+  const ppiScore =
+    Math.min(
+      20,
+      Math.max(
+        -10,
+        (ppi - 300) / 12
+      )
+    );
+
+
+  /*
+    RAM score
+  */
+
+  const ramScore =
+    Math.min(
+      12,
+      ram * 0.8
+    );
+
+
+  /*
+    Storage score
+  */
+
+  const storageScore =
+    Math.min(
+      5,
+      storage / 128
+    );
+
+
+  /*
+    DPR score
+  */
+
+  const dprScore =
+    Math.min(
+      10,
+      dpr * 3
+    );
+
+
+  /*
+    Brand difference
+  */
+
+  const brandScore =
+    BRAND_FACTOR[state.brand] || 0;
+
+
+  return (
+    125 +
+    resolutionScore +
+    ppiScore +
+    ramScore +
+    storageScore +
+    dprScore +
+    brandScore
+  );
+}
+
+
+/* GENERATE SENSITIVITY */
+
+function generateSensitivity() {
+
+  const score =
+    getDeviceScore();
+
+
+  /*
+    General sensitivity
+
     0 - 200
   */
 
-  let base =
-    165 +
-    Math.round((ppi - 300) / 20);
-
-
-  /*
-    RAM adjustment
-  */
-
-  if(ram >= 8){
-    base += 5;
-  }
-
-  if(ram >= 12){
-    base += 4;
-  }
-
-  if(ram >= 16){
-    base += 3;
-  }
-
-
-  /*
-    Never above 200
-  */
-
-  base =
-    Math.max(
+  const general =
+    clamp(
+      Math.round(score + 18),
       100,
-      Math.min(200, base)
+      200
+    );
+
+
+  const redDot =
+    clamp(
+      Math.round(score + 10),
+      90,
+      195
+    );
+
+
+  const scope2x =
+    clamp(
+      Math.round(score + 2),
+      80,
+      190
+    );
+
+
+  const scope4x =
+    clamp(
+      Math.round(score - 12),
+      70,
+      180
+    );
+
+
+  const sniper =
+    clamp(
+      Math.round(score - 45),
+      40,
+      140
+    );
+
+
+  const freeLook =
+    clamp(
+      Math.round(score + 5),
+      90,
+      195
     );
 
 
   return {
-
-    general:
-      Math.min(200, base + 10),
-
-    redDot:
-      Math.min(200, base + 5),
-
-    scope2x:
-      Math.min(200, base),
-
-    scope4x:
-      Math.max(80, base - 10),
-
-    sniper:
-      Math.max(50, base - 45),
-
-    freeLook:
-      Math.min(200, base + 2)
-
+    general,
+    redDot,
+    scope2x,
+    scope4x,
+    sniper,
+    freeLook
   };
+}
+
+
+/* CLAMP */
+
+function clamp(value, min, max) {
+
+  return Math.max(
+    min,
+    Math.min(max, value)
+  );
 
 }
 
 
 /* SHOW RESULT */
 
-function showResult(){
+function showResult() {
 
   const ram =
     getRam();
@@ -267,7 +427,7 @@ function showResult(){
     `~${ppi} PPI`;
 
 
-  /* SENSITIVITY CARDS */
+  /* SENSITIVITY */
 
   const settings = [
 
@@ -301,14 +461,22 @@ function showResult(){
 
   /* FIRE BUTTON */
 
+  const deviceScore =
+    getDeviceScore();
+
+
   let fireButton =
-    48 + Math.round(ram / 4);
+    48 +
+    Math.round(
+      (deviceScore - 125) / 8
+    );
 
 
   fireButton =
-    Math.max(
+    clamp(
+      fireButton,
       45,
-      Math.min(55, fireButton)
+      60
     );
 
 
@@ -319,13 +487,17 @@ function showResult(){
   /* RECOMMENDED DPI */
 
   let recommendedDpi =
-    Math.round(ppi * 1.25);
+    Math.round(
+      360 +
+      (deviceScore - 125) * 2.5
+    );
 
 
   recommendedDpi =
-    Math.max(
+    clamp(
+      recommendedDpi,
       320,
-      Math.min(560, recommendedDpi)
+      560
     );
 
 
@@ -339,20 +511,26 @@ function showResult(){
 
 /* RESTART */
 
-function restart(){
+function restart() {
 
   state.brand = "";
   state.ram = "";
   state.storage = "";
   state.density = 0;
+  state.screenWidth = 0;
+  state.screenHeight = 0;
+  state.dpr = 1;
+
 
   $("brandNext").disabled = true;
+
 
   document
     .querySelectorAll(".brand")
     .forEach((item) => {
       item.classList.remove("selected");
     });
+
 
   goTo("home");
 }
