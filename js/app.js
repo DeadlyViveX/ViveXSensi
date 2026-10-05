@@ -11,7 +11,9 @@ const state = {
 const $ = (id) => document.getElementById(id);
 
 
-/* PHONE BRANDS */
+/* ================================
+   PHONE BRANDS
+================================ */
 
 const BRANDS = [
   "Samsung",
@@ -32,28 +34,33 @@ const BRANDS = [
 ];
 
 
-/* BRAND TUNING */
+/* ================================
+   BRAND TUNING
+   Small adjustment only
+================================ */
 
 const BRAND_FACTOR = {
   "Samsung": 0,
-  "Realme": 4,
-  "Vivo": 3,
-  "OPPO": 2,
-  "Xiaomi": 4,
-  "OnePlus": 5,
-  "Motorola": 1,
-  "Infinix": 6,
-  "Tecno": 6,
-  "iQOO": 7,
-  "Apple": -4,
-  "POCO": 5,
-  "Nothing": 2,
+  "Realme": 2,
+  "Vivo": 2,
+  "OPPO": 1,
+  "Xiaomi": 3,
+  "OnePlus": 4,
+  "Motorola": 0,
+  "Infinix": 3,
+  "Tecno": 3,
+  "iQOO": 5,
+  "Apple": -3,
+  "POCO": 4,
+  "Nothing": 1,
   "Honor": 1,
   "Google Pixel": -2
 };
 
 
-/* PAGE NAVIGATION */
+/* ================================
+   NAVIGATION
+================================ */
 
 function goTo(id) {
 
@@ -72,7 +79,9 @@ function goTo(id) {
 }
 
 
-/* LOAD BRANDS */
+/* ================================
+   LOAD BRANDS
+================================ */
 
 function init() {
 
@@ -89,7 +98,9 @@ function init() {
 }
 
 
-/* SELECT BRAND */
+/* ================================
+   SELECT BRAND
+================================ */
 
 function selectBrand(brand, element) {
 
@@ -107,11 +118,14 @@ function selectBrand(brand, element) {
 }
 
 
-/* OPEN DEVICE PAGE */
+/* ================================
+   DEVICE PAGE
+================================ */
 
 function openDeviceStep() {
 
-  $("selectedBrand").textContent = state.brand;
+  $("selectedBrand").textContent =
+    state.brand;
 
   $("ramSelect").value = "";
   $("storageSelect").value = "";
@@ -132,7 +146,9 @@ function openDeviceStep() {
 }
 
 
-/* PIXEL DENSITY / SCREEN SCAN */
+/* ================================
+   SCREEN / DENSITY SCAN
+================================ */
 
 function scanDensity() {
 
@@ -150,11 +166,10 @@ function scanDensity() {
     );
 
   /*
-    Browser se exact Android system DPI
-    reliably detect nahi hota.
+    Browser exact Android system DPI
+    reliably detect nahi kar sakta.
 
-    Isliye DPR se estimated PPI banaya
-    ja raha hai.
+    Isliye DPR based estimated PPI.
   */
 
   const ppi =
@@ -168,14 +183,16 @@ function scanDensity() {
 
 
   $("densityText").textContent =
-    `Detected • ${width} × ${height} • ${dpr}x • ~${ppi} PPI`;
+    `Detected • ${width} × ${height} • ${dpr.toFixed(2)}x • ~${ppi} PPI`;
 
 
   updateNext();
 }
 
 
-/* CHECK NEXT BUTTON */
+/* ================================
+   CHECK DEVICE BUTTON
+================================ */
 
 function updateNext() {
 
@@ -187,7 +204,9 @@ function updateNext() {
 }
 
 
-/* RAM */
+/* ================================
+   RAM
+================================ */
 
 function getRam() {
 
@@ -196,26 +215,37 @@ function getRam() {
 }
 
 
-/* STORAGE */
+/* ================================
+   STORAGE
+================================ */
 
 function getStorage() {
 
-  const value =
-    state.storage
-      .replace(" GB", "")
-      .replace(" TB", "");
-
-  if (state.storage.includes("TB")) {
-    return parseFloat(value) * 1024;
+  if (!state.storage) {
+    return 64;
   }
 
-  return parseInt(value) || 64;
+  if (state.storage.includes("TB")) {
+
+    const tb =
+      parseFloat(
+        state.storage
+      );
+
+    return tb * 1024;
+  }
+
+  return parseInt(
+    state.storage
+  ) || 64;
 }
 
 
-/* DEVICE SCORE */
+/* ================================
+   DEVICE PROFILE
+================================ */
 
-function getDeviceScore() {
+function getDeviceProfile() {
 
   const ram =
     getRam();
@@ -231,7 +261,75 @@ function getDeviceScore() {
 
 
   /*
-    Screen resolution score
+    --------------------------------
+    RAM FACTOR
+    --------------------------------
+
+    RAM ka effect intentionally small
+    rakha gaya hai.
+
+    4GB  = 0
+    6GB  = +1
+    8GB  = +2
+    12GB = +3
+    16GB = +4
+    24GB = +5
+  */
+
+  let ramFactor = 0;
+
+  if (ram >= 6) {
+    ramFactor += 1;
+  }
+
+  if (ram >= 8) {
+    ramFactor += 1;
+  }
+
+  if (ram >= 12) {
+    ramFactor += 1;
+  }
+
+  if (ram >= 16) {
+    ramFactor += 1;
+  }
+
+  if (ram >= 24) {
+    ramFactor += 1;
+  }
+
+
+  /*
+    --------------------------------
+    STORAGE FACTOR
+    --------------------------------
+
+    Storage ka effect bahut small hai.
+  */
+
+  let storageFactor = 0;
+
+  if (storage >= 128) {
+    storageFactor += 1;
+  }
+
+  if (storage >= 256) {
+    storageFactor += 1;
+  }
+
+  if (storage >= 512) {
+    storageFactor += 1;
+  }
+
+  if (storage >= 1024) {
+    storageFactor += 1;
+  }
+
+
+  /*
+    --------------------------------
+    SCREEN RESOLUTION
+    --------------------------------
   */
 
   const pixels =
@@ -239,137 +337,197 @@ function getDeviceScore() {
     state.screenHeight;
 
 
-  const resolutionScore =
-    Math.min(
-      20,
-      pixels / 180000
-    );
+  let resolutionFactor = 0;
+
+  if (pixels >= 2000000) {
+    resolutionFactor += 1;
+  }
+
+  if (pixels >= 2500000) {
+    resolutionFactor += 1;
+  }
+
+  if (pixels >= 3000000) {
+    resolutionFactor += 1;
+  }
+
+  if (pixels >= 4000000) {
+    resolutionFactor += 1;
+  }
 
 
   /*
-    PPI score
+    --------------------------------
+    PPI
+    --------------------------------
   */
 
-  const ppiScore =
-    Math.min(
-      20,
-      Math.max(
-        -10,
-        (ppi - 300) / 12
-      )
-    );
+  let ppiFactor = 0;
+
+  if (ppi >= 350) {
+    ppiFactor += 1;
+  }
+
+  if (ppi >= 400) {
+    ppiFactor += 1;
+  }
+
+  if (ppi >= 450) {
+    ppiFactor += 1;
+  }
+
+  if (ppi >= 500) {
+    ppiFactor += 1;
+  }
 
 
   /*
-    RAM score
+    --------------------------------
+    DPR
+    --------------------------------
   */
 
-  const ramScore =
-    Math.min(
-      12,
-      ram * 0.8
-    );
+  let dprFactor = 0;
+
+  if (dpr >= 2.5) {
+    dprFactor += 1;
+  }
+
+  if (dpr >= 3) {
+    dprFactor += 1;
+  }
+
+  if (dpr >= 3.5) {
+    dprFactor += 1;
+  }
 
 
   /*
-    Storage score
+    BRAND
   */
 
-  const storageScore =
-    Math.min(
-      5,
-      storage / 128
-    );
-
-
-  /*
-    DPR score
-  */
-
-  const dprScore =
-    Math.min(
-      10,
-      dpr * 3
-    );
-
-
-  /*
-    Brand difference
-  */
-
-  const brandScore =
+  const brandFactor =
     BRAND_FACTOR[state.brand] || 0;
 
 
-  return (
-    125 +
-    resolutionScore +
-    ppiScore +
-    ramScore +
-    storageScore +
-    dprScore +
-    brandScore
-  );
+  /*
+    TOTAL DEVICE FACTOR
+  */
+
+  const totalFactor =
+    ramFactor +
+    storageFactor +
+    resolutionFactor +
+    ppiFactor +
+    dprFactor +
+    brandFactor;
+
+
+  return {
+    ram,
+    storage,
+    ppi,
+    dpr,
+    ramFactor,
+    storageFactor,
+    resolutionFactor,
+    ppiFactor,
+    dprFactor,
+    brandFactor,
+    totalFactor
+  };
 }
 
 
-/* GENERATE SENSITIVITY */
+/* ================================
+   GENERATE SENSITIVITY
+================================ */
 
 function generateSensitivity() {
 
-  const score =
-    getDeviceScore();
+  const profile =
+    getDeviceProfile();
 
 
   /*
-    General sensitivity
+    BASE
 
-    0 - 200
+    Device factor ke saath
+    sensitivity gradually change hogi.
+  */
+
+  const base =
+    145 +
+    profile.totalFactor;
+
+
+  /*
+    GENERAL
   */
 
   const general =
     clamp(
-      Math.round(score + 18),
+      base + 15,
       100,
       200
     );
 
 
+  /*
+    RED DOT
+  */
+
   const redDot =
     clamp(
-      Math.round(score + 10),
+      base + 8,
       90,
       195
     );
 
 
+  /*
+    2X
+  */
+
   const scope2x =
     clamp(
-      Math.round(score + 2),
+      base,
       80,
       190
     );
 
 
+  /*
+    4X
+  */
+
   const scope4x =
     clamp(
-      Math.round(score - 12),
+      base - 12,
       70,
       180
     );
 
 
+  /*
+    SNIPER
+  */
+
   const sniper =
     clamp(
-      Math.round(score - 45),
+      base - 45,
       40,
       140
     );
 
 
+  /*
+    FREE LOOK
+  */
+
   const freeLook =
     clamp(
-      Math.round(score + 5),
+      base + 4,
       90,
       195
     );
@@ -386,33 +544,38 @@ function generateSensitivity() {
 }
 
 
-/* CLAMP */
+/* ================================
+   CLAMP
+================================ */
 
 function clamp(value, min, max) {
 
   return Math.max(
     min,
-    Math.min(max, value)
+    Math.min(
+      max,
+      value
+    )
   );
-
 }
 
 
-/* SHOW RESULT */
+/* ================================
+   SHOW RESULT
+================================ */
 
 function showResult() {
 
-  const ram =
-    getRam();
-
-  const ppi =
-    state.density || 320;
+  const profile =
+    getDeviceProfile();
 
   const sensi =
     generateSensitivity();
 
 
-  /* DEVICE INFO */
+  /*
+    DEVICE INFO
+  */
 
   $("resultBrand").textContent =
     state.brand;
@@ -424,10 +587,12 @@ function showResult() {
     state.storage;
 
   $("resultDensity").textContent =
-    `~${ppi} PPI`;
+    `~${profile.ppi} PPI`;
 
 
-  /* SENSITIVITY */
+  /*
+    SENSITIVITY CARDS
+  */
 
   const settings = [
 
@@ -459,16 +624,17 @@ function showResult() {
       .join("");
 
 
-  /* FIRE BUTTON */
+  /*
+    FIRE BUTTON
 
-  const deviceScore =
-    getDeviceScore();
-
+    Device performance ke according
+    small adjustment.
+  */
 
   let fireButton =
     48 +
     Math.round(
-      (deviceScore - 125) / 8
+      profile.totalFactor / 2
     );
 
 
@@ -476,7 +642,7 @@ function showResult() {
     clamp(
       fireButton,
       45,
-      60
+      55
     );
 
 
@@ -484,12 +650,24 @@ function showResult() {
     `${fireButton}%`;
 
 
-  /* RECOMMENDED DPI */
+  /*
+    RECOMMENDED DPI
+
+    Ye actual Android system DPI nahi hai.
+    Recommendation hai.
+  */
 
   let recommendedDpi =
+    380 +
+    (
+      profile.ppi - 320
+    ) * 1.2 +
+    profile.totalFactor * 5;
+
+
+  recommendedDpi =
     Math.round(
-      360 +
-      (deviceScore - 125) * 2.5
+      recommendedDpi
     );
 
 
@@ -509,7 +687,9 @@ function showResult() {
 }
 
 
-/* RESTART */
+/* ================================
+   RESTART
+================================ */
 
 function restart() {
 
@@ -536,6 +716,8 @@ function restart() {
 }
 
 
-/* START */
+/* ================================
+   START
+================================ */
 
 init();
