@@ -16,15 +16,22 @@
 
 html{
   scroll-behavior:smooth;
+  width:100%;
+  height:100%;
 }
 
 body{
   font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:var(--bg);
   color:var(--white);
-  min-height:100vh;
-  overflow-x:hidden;
+  width:100%;
+  height:100%;
+  min-height:100%;
+  overflow:hidden;
 }
+
+
+/* BACKGROUND GLOW */
 
 .bg-glow{
   position:fixed;
@@ -41,20 +48,31 @@ body{
   z-index:0;
 }
 
+
+/* APP */
+
 .app{
   position:relative;
   z-index:1;
   width:100%;
   max-width:520px;
-  min-height:100vh;
+  height:100dvh;
+  min-height:0;
   margin:auto;
-  padding:22px;
+  padding:18px 22px 12px;
+  overflow:hidden;
 }
+
+
+/* SCREENS */
 
 .screen{
   display:none;
-  min-height:calc(100vh - 44px);
+  width:100%;
+  height:100%;
+  min-height:0;
   flex-direction:column;
+  overflow:hidden;
   animation:fade .25s ease;
 }
 
@@ -86,22 +104,22 @@ body{
 .logo-mark{
   width:100px;
   height:100px;
-  border:2px solid var(--red);
-  border-radius:26px;
-  display:grid;
-  place-items:center;
+  border:3px solid var(--red);
+  border-radius:28px;
   overflow:hidden;
   background:#0d0d0d;
   box-shadow:0 0 40px rgba(255,31,50,.25);
   margin-bottom:25px;
+  padding:6px;
+  flex-shrink:0;
 }
 
 .logo-mark img{
   width:100%;
   height:100%;
-  object-fit:contain;
-  padding:7px;
   display:block;
+  object-fit:cover;
+  border-radius:20px;
 }
 
 .eyebrow{
@@ -113,7 +131,7 @@ body{
 }
 
 h1{
-  font-size:52px;
+  font-size:44px;
   line-height:1;
   font-weight:900;
   letter-spacing:-2px;
@@ -154,13 +172,14 @@ h2{
     var(--red2)
   );
   color:#fff;
-  padding:17px 20px;
+  padding:16px 20px;
   border-radius:14px;
   font-size:16px;
   font-weight:800;
   cursor:pointer;
   box-shadow:0 10px 30px rgba(255,31,50,.18);
   transition:.2s;
+  flex-shrink:0;
 }
 
 .primary:hover{
@@ -180,6 +199,8 @@ h2{
 
 .bottom-btn{
   margin-top:auto;
+  margin-bottom:4px;
+  flex-shrink:0;
 }
 
 
@@ -189,11 +210,12 @@ h2{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  margin-bottom:48px;
+  margin-bottom:38px;
   color:#666;
   font-size:11px;
   font-weight:800;
   letter-spacing:2px;
+  flex-shrink:0;
 }
 
 .back{
@@ -205,6 +227,7 @@ h2{
   border-radius:12px;
   font-size:20px;
   cursor:pointer;
+  flex-shrink:0;
 }
 
 
@@ -215,13 +238,14 @@ h2{
   grid-template-columns:1fr 1fr;
   gap:11px;
   margin-top:25px;
+  overflow:hidden;
 }
 
 .brand{
   background:var(--card);
   border:1px solid var(--line);
   color:#ddd;
-  padding:17px;
+  padding:15px;
   border-radius:14px;
   text-align:left;
   font-weight:700;
@@ -252,6 +276,7 @@ h2{
   border-radius:14px;
   padding:15px;
   margin-top:25px;
+  flex-shrink:0;
 }
 
 .selected-brand small{
@@ -273,10 +298,11 @@ h2{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12px;
+  flex-shrink:0;
 }
 
 .field{
-  margin-top:25px;
+  margin-top:20px;
 }
 
 .field label{
@@ -293,7 +319,7 @@ select{
   color:#fff;
   border:1px solid var(--line);
   border-radius:13px;
-  padding:16px;
+  padding:15px;
   outline:none;
   font-size:15px;
 }
@@ -313,7 +339,8 @@ select:focus{
   border:1px solid var(--line);
   border-radius:15px;
   padding:14px;
-  margin-top:25px;
+  margin-top:20px;
+  flex-shrink:0;
 }
 
 .scan-icon{
@@ -325,10 +352,12 @@ select:focus{
   color:var(--red);
   border-radius:11px;
   font-size:24px;
+  flex-shrink:0;
 }
 
 .scan-info{
   min-width:0;
+  flex:1;
 }
 
 .scan-card strong{
@@ -340,6 +369,7 @@ select:focus{
   font-size:11px;
   margin-top:3px;
   line-height:1.4;
+  word-break:break-word;
 }
 
 .scan-btn{
@@ -351,6 +381,7 @@ select:focus{
   padding:10px 14px;
   font-weight:800;
   cursor:pointer;
+  flex-shrink:0;
 }
 
 
@@ -365,7 +396,8 @@ select:focus{
   border:1px solid #292929;
   border-radius:17px;
   padding:18px;
-  margin:25px 0 14px;
+  margin:20px 0 14px;
+  flex-shrink:0;
 }
 
 .device-title{
@@ -395,12 +427,13 @@ select:focus{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
+  flex-shrink:0;
 }
 
 .setting{
   background:#101010;
   border:1px solid var(--line);
-  padding:15px;
+  padding:13px;
   border-radius:13px;
 }
 
@@ -414,7 +447,7 @@ select:focus{
 }
 
 .setting strong{
-  font-size:27px;
+  font-size:25px;
   color:#fff;
   display:block;
   margin-top:4px;
@@ -428,19 +461,20 @@ select:focus{
   grid-template-columns:1fr 1fr;
   gap:10px;
   margin-top:10px;
+  flex-shrink:0;
 }
 
 .recommend-row>div{
   background:#19090b;
   border:1px solid #48131a;
-  padding:16px;
+  padding:14px;
   border-radius:13px;
 }
 
 .recommend-row strong{
   display:block;
   color:var(--red);
-  font-size:25px;
+  font-size:24px;
   margin-top:5px;
 }
 
@@ -451,8 +485,96 @@ select:focus{
   font-size:10px;
   color:#555;
   text-align:center;
-  margin:12px 0 4px;
+  margin:10px 0 2px;
   line-height:1.5;
+  flex-shrink:0;
+}
+
+
+/* MOBILE */
+
+@media(max-width:599px){
+
+  html,
+  body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+  }
+
+  .app{
+    width:100%;
+    height:100dvh;
+    max-height:100dvh;
+    min-height:0;
+    padding:18px 22px 12px;
+    overflow:hidden;
+  }
+
+  .screen{
+    width:100%;
+    height:100%;
+    max-height:100%;
+    min-height:0;
+    overflow:hidden;
+  }
+
+  h2{
+    font-size:30px;
+  }
+
+}
+
+
+/* SMALL PHONES */
+
+@media(max-height:700px){
+
+  .app{
+    padding-top:12px;
+    padding-bottom:8px;
+  }
+
+  .topbar{
+    margin-bottom:25px;
+  }
+
+  .selected-brand{
+    margin-top:18px;
+  }
+
+  .field{
+    margin-top:14px;
+  }
+
+  .scan-card{
+    margin-top:14px;
+  }
+
+  .device-card{
+    margin-top:14px;
+  }
+
+  .setting{
+    padding:10px;
+  }
+
+  .setting strong{
+    font-size:22px;
+  }
+
+  .recommend-row>div{
+    padding:11px;
+  }
+
+  .recommend-row strong{
+    font-size:21px;
+  }
+
+  .disclaimer{
+    margin-top:6px;
+  }
+
 }
 
 
