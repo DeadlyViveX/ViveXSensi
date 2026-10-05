@@ -8,6 +8,11 @@ const state = {
   dpr: 1
 };
 
+
+/* ================================
+   HELPERS
+================================ */
+
 const $ = (id) => document.getElementById(id);
 
 
@@ -36,7 +41,6 @@ const BRANDS = [
 
 /* ================================
    BRAND TUNING
-   Small adjustment only
 ================================ */
 
 const BRAND_FACTOR = {
@@ -166,7 +170,7 @@ function scanDensity() {
     );
 
   /*
-    Browser exact Android system DPI
+    Browser actual Android system DPI
     reliably detect nahi kar sakta.
 
     Isliye DPR based estimated PPI.
@@ -211,7 +215,6 @@ function updateNext() {
 function getRam() {
 
   return parseInt(state.ram) || 4;
-
 }
 
 
@@ -242,6 +245,86 @@ function getStorage() {
 
 
 /* ================================
+   RAM EFFECT
+================================
+
+   Total RAM effect ≈ 10 points.
+
+   4GB  = +5
+   6GB  = +3
+   8GB  = +1
+   12GB = -1
+   16GB = -3
+   24GB = -5
+*/
+
+function getRamEffect(ram) {
+
+  if (ram <= 4) {
+    return 5;
+  }
+
+  if (ram <= 6) {
+    return 3;
+  }
+
+  if (ram <= 8) {
+    return 1;
+  }
+
+  if (ram <= 12) {
+    return -1;
+  }
+
+  if (ram <= 16) {
+    return -3;
+  }
+
+  return -5;
+}
+
+
+/* ================================
+   STORAGE EFFECT
+================================
+
+   Total Storage effect ≈ 10 points.
+
+   32GB  = +5
+   64GB  = +3
+   128GB = +1
+   256GB = -1
+   512GB = -3
+   1TB   = -5
+*/
+
+function getStorageEffect(storage) {
+
+  if (storage <= 32) {
+    return 5;
+  }
+
+  if (storage <= 64) {
+    return 3;
+  }
+
+  if (storage <= 128) {
+    return 1;
+  }
+
+  if (storage <= 256) {
+    return -1;
+  }
+
+  if (storage <= 512) {
+    return -3;
+  }
+
+  return -5;
+}
+
+
+/* ================================
    DEVICE PROFILE
 ================================ */
 
@@ -260,77 +343,25 @@ function getDeviceProfile() {
     state.dpr || 1;
 
 
-  /*
-    --------------------------------
-    RAM FACTOR
-    --------------------------------
+  /* --------------------------------
+     RAM
+  -------------------------------- */
 
-    RAM ka effect intentionally small
-    rakha gaya hai.
-
-    4GB  = 0
-    6GB  = +1
-    8GB  = +2
-    12GB = +3
-    16GB = +4
-    24GB = +5
-  */
-
-  let ramFactor = 0;
-
-  if (ram >= 6) {
-    ramFactor += 1;
-  }
-
-  if (ram >= 8) {
-    ramFactor += 1;
-  }
-
-  if (ram >= 12) {
-    ramFactor += 1;
-  }
-
-  if (ram >= 16) {
-    ramFactor += 1;
-  }
-
-  if (ram >= 24) {
-    ramFactor += 1;
-  }
+  const ramEffect =
+    getRamEffect(ram);
 
 
-  /*
-    --------------------------------
-    STORAGE FACTOR
-    --------------------------------
+  /* --------------------------------
+     STORAGE
+  -------------------------------- */
 
-    Storage ka effect bahut small hai.
-  */
-
-  let storageFactor = 0;
-
-  if (storage >= 128) {
-    storageFactor += 1;
-  }
-
-  if (storage >= 256) {
-    storageFactor += 1;
-  }
-
-  if (storage >= 512) {
-    storageFactor += 1;
-  }
-
-  if (storage >= 1024) {
-    storageFactor += 1;
-  }
+  const storageEffect =
+    getStorageEffect(storage);
 
 
-  /*
-    --------------------------------
-    SCREEN RESOLUTION
-    --------------------------------
-  */
+  /* --------------------------------
+     SCREEN RESOLUTION
+  -------------------------------- */
 
   const pixels =
     state.screenWidth *
@@ -356,11 +387,9 @@ function getDeviceProfile() {
   }
 
 
-  /*
-    --------------------------------
-    PPI
-    --------------------------------
-  */
+  /* --------------------------------
+     PPI
+  -------------------------------- */
 
   let ppiFactor = 0;
 
@@ -381,11 +410,9 @@ function getDeviceProfile() {
   }
 
 
-  /*
-    --------------------------------
-    DPR
-    --------------------------------
-  */
+  /* --------------------------------
+     DPR
+  -------------------------------- */
 
   let dprFactor = 0;
 
@@ -402,25 +429,41 @@ function getDeviceProfile() {
   }
 
 
-  /*
-    BRAND
-  */
+  /* --------------------------------
+     BRAND
+  -------------------------------- */
 
   const brandFactor =
     BRAND_FACTOR[state.brand] || 0;
 
 
-  /*
-    TOTAL DEVICE FACTOR
+  /* --------------------------------
+     DEVICE EFFECT
+  --------------------------------
+
+     Display/device factors main hain.
   */
 
-  const totalFactor =
-    ramFactor +
-    storageFactor +
+  const deviceFactor =
     resolutionFactor +
     ppiFactor +
     dprFactor +
     brandFactor;
+
+
+  /* --------------------------------
+     TOTAL EFFECT
+  --------------------------------
+
+     Device effect
+     + RAM effect
+     + Storage effect
+  */
+
+  const totalFactor =
+    deviceFactor +
+    ramEffect +
+    storageEffect;
 
 
   return {
@@ -428,12 +471,16 @@ function getDeviceProfile() {
     storage,
     ppi,
     dpr,
-    ramFactor,
-    storageFactor,
+
+    ramEffect,
+    storageEffect,
+
     resolutionFactor,
     ppiFactor,
     dprFactor,
     brandFactor,
+
+    deviceFactor,
     totalFactor
   };
 }
@@ -452,8 +499,11 @@ function generateSensitivity() {
   /*
     BASE
 
-    Device factor ke saath
-    sensitivity gradually change hogi.
+    Device/display ka effect
+    strongly included hai.
+
+    RAM + Storage ka combined
+    maximum adjustment ~20 points.
   */
 
   const base =
@@ -461,9 +511,9 @@ function generateSensitivity() {
     profile.totalFactor;
 
 
-  /*
-    GENERAL
-  */
+  /* --------------------------------
+     GENERAL
+  -------------------------------- */
 
   const general =
     clamp(
@@ -473,9 +523,9 @@ function generateSensitivity() {
     );
 
 
-  /*
-    RED DOT
-  */
+  /* --------------------------------
+     RED DOT
+  -------------------------------- */
 
   const redDot =
     clamp(
@@ -485,9 +535,9 @@ function generateSensitivity() {
     );
 
 
-  /*
-    2X
-  */
+  /* --------------------------------
+     2X
+  -------------------------------- */
 
   const scope2x =
     clamp(
@@ -497,9 +547,9 @@ function generateSensitivity() {
     );
 
 
-  /*
-    4X
-  */
+  /* --------------------------------
+     4X
+  -------------------------------- */
 
   const scope4x =
     clamp(
@@ -509,9 +559,9 @@ function generateSensitivity() {
     );
 
 
-  /*
-    SNIPER
-  */
+  /* --------------------------------
+     SNIPER
+  -------------------------------- */
 
   const sniper =
     clamp(
@@ -521,9 +571,9 @@ function generateSensitivity() {
     );
 
 
-  /*
-    FREE LOOK
-  */
+  /* --------------------------------
+     FREE LOOK
+  -------------------------------- */
 
   const freeLook =
     clamp(
@@ -573,9 +623,9 @@ function showResult() {
     generateSensitivity();
 
 
-  /*
-    DEVICE INFO
-  */
+  /* --------------------------------
+     DEVICE INFO
+  -------------------------------- */
 
   $("resultBrand").textContent =
     state.brand;
@@ -590,9 +640,9 @@ function showResult() {
     `~${profile.ppi} PPI`;
 
 
-  /*
-    SENSITIVITY CARDS
-  */
+  /* --------------------------------
+     SENSITIVITY CARDS
+  -------------------------------- */
 
   const settings = [
 
@@ -624,12 +674,9 @@ function showResult() {
       .join("");
 
 
-  /*
-    FIRE BUTTON
-
-    Device performance ke according
-    small adjustment.
-  */
+  /* --------------------------------
+     FIRE BUTTON
+  -------------------------------- */
 
   let fireButton =
     48 +
@@ -650,11 +697,13 @@ function showResult() {
     `${fireButton}%`;
 
 
-  /*
-    RECOMMENDED DPI
+  /* --------------------------------
+     RECOMMENDED DPI
+  --------------------------------
 
-    Ye actual Android system DPI nahi hai.
-    Recommendation hai.
+     Device/display effect = main
+     RAM effect = small
+     Storage effect = small
   */
 
   let recommendedDpi =
@@ -662,7 +711,9 @@ function showResult() {
     (
       profile.ppi - 320
     ) * 1.2 +
-    profile.totalFactor * 5;
+    profile.deviceFactor * 5 +
+    profile.ramEffect * 3 +
+    profile.storageEffect * 2;
 
 
   recommendedDpi =
