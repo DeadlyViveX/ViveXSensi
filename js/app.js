@@ -1146,28 +1146,34 @@ function calculateSettings(){
   /* =====================================
      RECOMMENDED DPI
      MINIMUM 400
-     MAXIMUM 600
+     MAXIMUM 550
+     PPI HIGHER = DPI LOWER
   ===================================== */
 
   /*
-   * Smooth PPI-based DPI.
+   * Inverse PPI-based DPI.
    *
-   * 273 PPI ≈ 400+
-   * 300 PPI ≈ 420+
-   * 350 PPI ≈ 460+
-   * 373 PPI ≈ 480+
-   * 400 PPI ≈ 500+
+   * Lower PPI  = higher recommended DPI.
+   * Higher PPI = lower recommended DPI.
+   *
+   * Approximate examples:
+   *
+   * 273 PPI ≈ 550 DPI
+   * 300 PPI ≈ 510 DPI
+   * 320 PPI ≈ 480 DPI
+   * 350 PPI ≈ 435 DPI
+   * 373+ PPI ≈ 400 DPI
    *
    * RAM / storage / brand only
    * make small adjustments.
    */
 
   let dpi =
-    400 +
+    550 -
     (
       state.density -
       273
-    ) * 1.8;
+    ) * 1.5;
 
 
   /*
@@ -1188,14 +1194,14 @@ function calculateSettings(){
 
   /*
    * Keep recommended DPI
-   * between 400 and 600.
+   * between 400 and 550.
    */
 
   dpi =
     clamp(
       Math.round(dpi),
       400,
-      600
+      550
     );
 
 
