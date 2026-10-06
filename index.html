@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
 
+<head>
   <meta charset="UTF-8">
 
   <meta
@@ -11,31 +11,24 @@
 
   <meta
     name="theme-color"
-    content="#050505"
-  >
-
-  <meta
-    name="description"
-    content="ViveX Sensi - Free Fire sensitivity recommendations for your phone."
+    content="#080808"
   >
 
   <title>ViveX Sensi</title>
 
-  <!-- MAIN CSS -->
   <link
     rel="stylesheet"
     href="css/style.css"
   >
-
 </head>
 
 
 <body>
 
 
-  <!-- =========================================
+  <!-- ================================
        DESKTOP BLOCK
-  ========================================== -->
+  ================================= -->
 
   <div
     id="desktopBlock"
@@ -53,8 +46,8 @@
       </h1>
 
       <p>
-        Please open this website on your phone.
-        <br><br>
+        Please open this website on your phone.<br><br>
+
         If you are using a mobile device,
         please turn off "Desktop site"
         and reload the page.
@@ -65,16 +58,20 @@
   </div>
 
 
-  <!-- =========================================
-       APP
-  ========================================== -->
+
+  <!-- ================================
+       MAIN APP
+  ================================= -->
+
+  <div class="bg-glow"></div>
+
 
   <main class="app">
 
 
-    <!-- =======================================
+    <!-- ================================
          HOME
-    ======================================== -->
+    ================================= -->
 
     <section
       class="screen active"
@@ -119,6 +116,9 @@
       </button>
 
 
+
+      <!-- SOCIAL BUTTONS -->
+
       <div class="social-buttons">
 
 
@@ -130,6 +130,7 @@
         >
 
           <span>▶</span>
+
           YouTube
 
         </a>
@@ -143,6 +144,7 @@
         >
 
           <span>◎</span>
+
           Instagram
 
         </a>
@@ -153,14 +155,16 @@
     </section>
 
 
-    <!-- =======================================
+
+    <!-- ================================
          BRAND
-    ======================================== -->
+    ================================= -->
 
     <section
       class="screen"
       id="brand"
     >
+
 
       <div class="topbar">
 
@@ -212,17 +216,20 @@
 
       </button>
 
+
     </section>
 
 
-    <!-- =======================================
+
+    <!-- ================================
          DEVICE
-    ======================================== -->
+    ================================= -->
 
     <section
       class="screen"
       id="device"
     >
+
 
       <div class="topbar">
 
@@ -255,8 +262,6 @@
       </p>
 
 
-      <!-- SELECTED BRAND -->
-
       <div class="selected-brand">
 
         <small>
@@ -270,7 +275,6 @@
       </div>
 
 
-      <!-- RAM + STORAGE -->
 
       <div class="ram-storage">
 
@@ -280,6 +284,7 @@
           <label>
             RAM
           </label>
+
 
           <select
             id="ramSelect"
@@ -319,11 +324,13 @@
         </div>
 
 
+
         <div class="field">
 
           <label>
             Storage
           </label>
+
 
           <select
             id="storageSelect"
@@ -366,7 +373,8 @@
       </div>
 
 
-      <!-- PIXEL DENSITY SCANNER -->
+
+      <!-- SCAN -->
 
       <div class="scan-card">
 
@@ -400,6 +408,7 @@
       </div>
 
 
+
       <!-- GET SENSI -->
 
       <button
@@ -415,17 +424,20 @@
 
       </button>
 
+
     </section>
 
 
-    <!-- =======================================
+
+    <!-- ================================
          VERIFICATION
-    ======================================== -->
+    ================================= -->
 
     <section
       class="screen"
       id="verification"
     >
+
 
       <div class="topbar">
 
@@ -454,10 +466,10 @@
 
 
       <p class="hint">
-        Enter the verification code if you already
-        have it, or tap on the Get Verification Code
-        button.
+        Enter the verification code
+        sent to your email.
       </p>
+
 
 
       <div class="verification-box">
@@ -473,6 +485,7 @@
       </div>
 
 
+
       <button
         class="primary"
         onclick="verifyCode()"
@@ -485,6 +498,7 @@
       </button>
 
 
+
       <button
         class="secondary-btn"
         onclick="openPayment()"
@@ -494,17 +508,20 @@
 
       </button>
 
+
     </section>
 
 
-    <!-- =======================================
+
+    <!-- ================================
          PAYMENT
-    ======================================== -->
+    ================================= -->
 
     <section
       class="screen"
       id="payment"
     >
+
 
       <div class="topbar">
 
@@ -532,6 +549,7 @@
       </h2>
 
 
+
       <!-- PRICE -->
 
       <div class="price-card">
@@ -545,13 +563,11 @@
         </strong>
 
         <p>
-          No refunds are available.
-          Please pay exactly ₹29.
-          We are not responsible for payments
-          above or below ₹29.
+          Lifetime access
         </p>
 
       </div>
+
 
 
       <!-- QR -->
@@ -564,6 +580,7 @@
         >
 
       </div>
+
 
 
       <!-- UPI -->
@@ -581,9 +598,11 @@
       </div>
 
 
+
       <!-- GOOGLE FORM -->
 
       <div class="form-card">
+
 
         <h3>
           Payment Details
@@ -608,10 +627,10 @@
           Loading…
         </iframe>
 
+
       </div>
 
 
-      <!-- PAYMENT SUBMITTED -->
 
       <button
         class="primary payment-submit-btn"
@@ -626,21 +645,26 @@
 
 
       <p class="form-note">
+
         After submitting the Google Form,
         tap the button above.
+
       </p>
+
 
     </section>
 
 
-    <!-- =======================================
+
+    <!-- ================================
          CONFIRMATION
-    ======================================== -->
+    ================================= -->
 
     <section
       class="screen"
       id="confirmation"
     >
+
 
       <div class="topbar">
 
@@ -672,22 +696,15 @@
 
 
         <p>
-
           Your payment will be verified manually.
           After verification, your verification
           code will be sent to your email within
           24 hours.
-
-          <br><br>
-
-          Once you receive the code, go to the
-          Verification Page and enter the code
-          to unlock your settings.
-
         </p>
 
 
       </div>
+
 
 
       <button
@@ -701,17 +718,20 @@
 
       </button>
 
+
     </section>
 
 
-    <!-- =======================================
+
+    <!-- ================================
          RESULT
-    ======================================== -->
+    ================================= -->
 
     <section
       class="screen"
       id="result"
     >
+
 
       <div class="topbar">
 
@@ -739,7 +759,6 @@
       </h2>
 
 
-      <!-- DEVICE CARD -->
 
       <div class="device-card">
 
@@ -770,7 +789,6 @@
       </div>
 
 
-      <!-- SETTINGS -->
 
       <div
         class="settings-grid"
@@ -778,7 +796,6 @@
       ></div>
 
 
-      <!-- FIRE BUTTON + DPI -->
 
       <div class="recommend-row">
 
@@ -794,6 +811,7 @@
           </strong>
 
         </div>
+
 
 
         <div>
@@ -812,7 +830,6 @@
       </div>
 
 
-      <!-- RESTART -->
 
       <button
         class="primary bottom-btn"
@@ -824,6 +841,7 @@
       </button>
 
 
+
       <p class="disclaimer">
 
         Settings are recommendations.
@@ -831,15 +849,17 @@
 
       </p>
 
+
     </section>
 
 
   </main>
 
 
-  <!-- =========================================
-       ERROR POPUP
-  ========================================== -->
+
+  <!-- ================================
+       CUSTOM ERROR POPUP
+  ================================= -->
 
   <div
     class="custom-popup"
@@ -876,11 +896,9 @@
   </div>
 
 
-  <!-- =========================================
-       MAIN JS
-  ========================================== -->
 
   <script src="js/app.js"></script>
 
 </body>
+
 </html>
