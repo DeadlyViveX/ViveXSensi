@@ -113,9 +113,7 @@ body{
 }
 
 
-/* =================================
-   HOME
-================================= */
+/* HOME */
 
 #home{
   justify-content:center;
@@ -209,9 +207,7 @@ h2{
 }
 
 
-/* =================================
-   PRIMARY BUTTON
-================================= */
+/* PRIMARY BUTTON */
 
 .primary{
   width:100%;
@@ -272,9 +268,7 @@ h2{
 }
 
 
-/* =================================
-   SOCIAL
-================================= */
+/* SOCIAL BUTTONS */
 
 .social-buttons{
   width:100%;
@@ -341,9 +335,7 @@ h2{
 }
 
 
-/* =================================
-   TOP BAR
-================================= */
+/* TOP BAR */
 
 .topbar{
   display:flex;
@@ -382,9 +374,7 @@ h2{
 }
 
 
-/* =================================
-   BRAND
-================================= */
+/* BRAND */
 
 .brand-grid{
   display:grid;
@@ -439,9 +429,7 @@ h2{
 }
 
 
-/* =================================
-   SELECTED BRAND
-================================= */
+/* SELECTED BRAND */
 
 .selected-brand{
   background:#15080a;
@@ -480,9 +468,7 @@ h2{
 }
 
 
-/* =================================
-   RAM / STORAGE
-================================= */
+/* RAM / STORAGE */
 
 .ram-storage{
   display:grid;
@@ -535,9 +521,7 @@ select:focus{
 }
 
 
-/* =================================
-   SCAN
-================================= */
+/* SCAN CARD */
 
 .scan-card{
   display:flex;
@@ -622,9 +606,7 @@ select:focus{
 }
 
 
-/* =================================
-   VERIFICATION
-================================= */
+/* VERIFICATION */
 
 .verification-box{
   margin:25px 0 12px;
@@ -695,9 +677,7 @@ select:focus{
 }
 
 
-/* =================================
-   PAYMENT
-================================= */
+/* PAYMENT */
 
 .price-card{
   margin-top:20px;
@@ -747,9 +727,7 @@ select:focus{
 }
 
 
-/* =================================
-   QR
-================================= */
+/* QR */
 
 .qr-card{
   display:flex;
@@ -775,9 +753,7 @@ select:focus{
 }
 
 
-/* =================================
-   UPI
-================================= */
+/* UPI */
 
 .upi-box{
   margin-top:12px;
@@ -820,9 +796,7 @@ select:focus{
 }
 
 
-/* =================================
-   FORM
-================================= */
+/* FORM */
 
 .form-card{
   margin-top:18px;
@@ -888,9 +862,7 @@ select:focus{
 }
 
 
-/* =================================
-   CONFIRMATION
-================================= */
+/* CONFIRMATION */
 
 .confirmation-card{
   margin-top:40px;
@@ -941,9 +913,7 @@ select:focus{
 }
 
 
-/* =================================
-   RESULT DEVICE CARD
-================================= */
+/* RESULT DEVICE CARD */
 
 .device-card{
   background:
@@ -994,9 +964,7 @@ select:focus{
 }
 
 
-/* =================================
-   SENSITIVITY
-================================= */
+/* SENSITIVITY */
 
 .settings-grid{
   display:grid;
@@ -1043,9 +1011,7 @@ select:focus{
 }
 
 
-/* =================================
-   RECOMMENDATION
-================================= */
+/* RECOMMENDATION */
 
 .recommend-row{
   display:grid;
@@ -1080,9 +1046,7 @@ select:focus{
 }
 
 
-/* =================================
-   DISCLAIMER
-================================= */
+/* DISCLAIMER */
 
 .disclaimer{
   font-size:10px;
@@ -1094,6 +1058,149 @@ select:focus{
   margin:10px 0 4px;
 
   line-height:1.5;
+}
+
+
+/* =================================
+   CUSTOM POPUP
+================================= */
+
+.custom-popup{
+  position:fixed;
+
+  inset:0;
+
+  z-index:999999;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  padding:25px;
+
+  background:rgba(0,0,0,.78);
+
+  backdrop-filter:blur(6px);
+
+  opacity:0;
+
+  visibility:hidden;
+
+  pointer-events:none;
+
+  transition:.2s;
+}
+
+
+.custom-popup.show{
+  opacity:1;
+
+  visibility:visible;
+
+  pointer-events:auto;
+}
+
+
+.custom-popup-card{
+  width:100%;
+
+  max-width:360px;
+
+  padding:25px 20px;
+
+  background:#111;
+
+  border:1px solid #3a171b;
+
+  border-radius:20px;
+
+  text-align:center;
+
+  box-shadow:
+    0 20px 70px
+    rgba(0,0,0,.7);
+
+  transform:scale(.92);
+
+  transition:.2s;
+}
+
+
+.custom-popup.show
+.custom-popup-card{
+  transform:scale(1);
+}
+
+
+.custom-popup-icon{
+  width:55px;
+
+  height:55px;
+
+  display:grid;
+
+  place-items:center;
+
+  margin:0 auto 15px;
+
+  border-radius:50%;
+
+  background:#21090d;
+
+  border:1px solid var(--red);
+
+  color:var(--red);
+
+  font-size:28px;
+
+  font-weight:900;
+}
+
+
+.custom-popup-card h3{
+  font-size:21px;
+
+  color:#fff;
+}
+
+
+.custom-popup-card p{
+  color:#888;
+
+  font-size:14px;
+
+  line-height:1.5;
+
+  margin-top:8px;
+}
+
+
+.custom-popup-card button{
+  width:100%;
+
+  margin-top:20px;
+
+  padding:13px;
+
+  border:0;
+
+  border-radius:12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--red),
+      var(--red2)
+    );
+
+  color:#fff;
+
+  font-size:15px;
+
+  font-weight:800;
+
+  cursor:pointer;
 }
 
 
@@ -1417,6 +1524,18 @@ select:focus{
 
   .disclaimer{
     margin-top:7px;
+  }
+
+
+  .custom-popup{
+    padding:20px;
+  }
+
+
+  .custom-popup-card{
+    max-width:340px;
+
+    padding:23px 17px;
   }
 
 }
