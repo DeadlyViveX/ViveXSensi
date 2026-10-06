@@ -78,11 +78,11 @@ function getDeviceId(){
 
     if(
       window.crypto &&
-      crypto.randomUUID
+      window.crypto.randomUUID
     ){
 
       deviceId =
-        crypto.randomUUID();
+        window.crypto.randomUUID();
 
     }
     else{
@@ -306,11 +306,18 @@ function init(){
       button.textContent =
         brand;
 
-      button.onclick =
-        () => selectBrand(
-          brand,
-          button
-        );
+      button.addEventListener(
+        "click",
+        () => {
+
+          selectBrand(
+            brand,
+            button
+          );
+
+        }
+      );
+
 
       brandGrid.appendChild(
         button
@@ -376,9 +383,16 @@ function openDeviceStep(){
   }
 
 
-  $("selectedBrand")
-    .textContent =
-    state.brand;
+  const selectedBrand =
+    $("selectedBrand");
+
+
+  if(selectedBrand){
+
+    selectedBrand.textContent =
+      state.brand;
+
+  }
 
 
   goTo("device");
@@ -409,11 +423,10 @@ function scanDensity(){
 
 
   /*
-   * Browser cannot directly read
-   * the actual Android system DPI.
+   * Browser cannot reliably read
+   * actual Android system DPI.
    *
-   * This remains an estimated PPI
-   * based on browser device density.
+   * This is an estimated PPI.
    */
 
   const ppi =
@@ -438,10 +451,13 @@ function scanDensity(){
     dpr;
 
 
-  if($("densityText")){
+  const densityText =
+    $("densityText");
 
-    $("densityText")
-      .textContent =
+
+  if(densityText){
+
+    densityText.textContent =
       `Detected • ${width} × ${height} • ${dpr.toFixed(2)}x • ~${ppi} PPI`;
 
   }
@@ -1146,45 +1162,25 @@ function calculateSettings(){
 
   /* =====================================
      RECOMMENDED DPI
-     FIXED INVERSE PPI LOGIC
+     400 - 550
+     INVERSE PPI RELATION
   ===================================== */
-
-  /*
-   * IMPORTANT:
-   *
-   * Browser PPI is an estimate.
-   * Android system DPI cannot be reliably
-   * read from a normal web browser.
-   *
-   * The recommendation therefore uses
-   * a consistent inverse relationship:
-   *
-   * LOWER PPI  = HIGHER DPI
-   * HIGHER PPI = LOWER DPI
-   *
-   * Approximate reference:
-   *
-   * 250 PPI -> ~517 DPI
-   * 273 PPI -> ~500 DPI
-   * 300 PPI -> ~480 DPI
-   * 350 PPI -> ~443 DPI
-   * 373 PPI -> ~426 DPI
-   * 400 PPI -> ~406 DPI
-   *
-   * RAM/storage/brand only make tiny
-   * adjustments so they cannot reverse
-   * the main PPI relationship.
-   */
-
 
   const ppi =
     state.density || 320;
 
 
   /*
-   * Main inverse PPI curve.
+   * Lower PPI  = Higher DPI
+   * Higher PPI = Lower DPI
    *
-   * 273 PPI is the anchor at 500 DPI.
+   * Reference:
+   *
+   * 273 PPI -> around 500 DPI
+   * 300 PPI -> around 480 DPI
+   * 350 PPI -> around 442 DPI
+   * 373 PPI -> around 425 DPI
+   * 400 PPI -> around 405 DPI
    */
 
   let dpi =
@@ -1196,35 +1192,35 @@ function calculateSettings(){
 
 
   /*
-   * Very small device adjustment.
+   * Small device adjustments.
    *
-   * These are intentionally kept small.
+   * These are deliberately small
+   * so PPI remains the main factor.
    */
 
   dpi +=
-    brandEffect * 0.8;
+    brandEffect * 2;
 
 
   dpi +=
-    ramEffect * 0.5;
+    ramEffect * 1;
 
 
   dpi +=
-    storageEffect * 0.25;
+    storageEffect * 0.5;
 
 
   /*
-   * Final recommendation range.
-   *
-   * Minimum 400 DPI
-   * Maximum 520 DPI
+   * FINAL DPI RANGE:
+   * 400 minimum
+   * 550 maximum
    */
 
   dpi =
     clamp(
       Math.round(dpi),
       400,
-      520
+      550
     );
 
 
@@ -1324,4 +1320,256 @@ function showResult(){
       </div>
 
       <div class="setting-card">
-        <
+        <small>RED DOT</small>
+        <strong>
+          ${result.settings.redDot}
+        </strong>
+      </div>
+
+      <div class="setting-card">
+        <small>2X SCOPE</small>
+        <strong>
+          ${result.settings.twoX}
+        </strong>
+      </div>
+
+      <div class="setting-card">
+        <small>4X SCOPE</small>
+        <strong>
+          ${result.settings.fourX}
+        </strong>
+      </div>
+
+      <div class="setting-card">
+        <small>SNIPER</small>
+        <strong>
+          ${result.settings.sniper}
+        </strong>
+      </div>
+
+      <div class="setting-card">
+        <small>FREE LOOK</small>
+        <strong>
+          ${result.settings.freeLook}
+        </strong>
+      </div>
+
+    `;
+
+  }
+
+
+  if($("fireButton")){
+
+    $("fireButton")
+      .textContent =
+      result.fireButton +
+      "%";
+
+  }
+
+
+  if($("dpi")){
+
+    $("dpi")
+      .textContent =
+      result.dpi;
+
+  }
+
+
+  goTo(
+    "result"
+  );
+
+}
+
+
+/* =========================================
+   RESTART
+========================================= */
+
+function restart(){
+
+  state.brand = "";
+  state.ram = "";
+  state.storage = "";
+
+  state.density = 0;
+
+  state.screenWidth = 0;
+  state.screenHeight = 0;
+
+  state.dpr = 1;
+
+
+  document
+    .querySelectorAll(
+      ".brand-btn"
+    )
+    .forEach(btn => {
+
+      btn.classList.remove(
+        "selected"
+      );
+
+    });
+
+
+  if($("ramSelect")){
+
+    $("ramSelect")
+      .value = "";
+
+  }
+
+
+  if($("storageSelect")){
+
+    $("storageSelect")
+      .value = "";
+
+  }
+
+
+  if($("densityText")){
+
+    $("densityText")
+      .textContent =
+      "Not scanned yet";
+
+  }
+
+
+  if($("selectedBrand")){
+
+    $("selectedBrand")
+      .textContent =
+      "Brand";
+
+  }
+
+
+  if($("verificationCode")){
+
+    $("verificationCode")
+      .value = "";
+
+  }
+
+
+  updateNext();
+
+
+  goTo(
+    "home"
+  );
+
+}
+
+
+/* =========================================
+   RAM SELECT
+========================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    const ramSelect =
+      $("ramSelect");
+
+
+    if(ramSelect){
+
+      ramSelect.addEventListener(
+        "change",
+        () => {
+
+          state.ram =
+            ramSelect.value;
+
+          updateNext();
+
+        }
+      );
+
+    }
+
+
+    const storageSelect =
+      $("storageSelect");
+
+
+    if(storageSelect){
+
+      storageSelect.addEventListener(
+        "change",
+        () => {
+
+          state.storage =
+            storageSelect.value;
+
+          updateNext();
+
+        }
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================
+   ENTER KEY FOR VERIFICATION
+========================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    const input =
+      $("verificationCode");
+
+
+    if(input){
+
+      input.addEventListener(
+        "keydown",
+        event => {
+
+          if(
+            event.key ===
+            "Enter"
+          ){
+
+            event.preventDefault();
+
+            verifyCode();
+
+          }
+
+        }
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================
+   START APP
+========================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    getDeviceId();
+
+    init();
+
+  }
+);
