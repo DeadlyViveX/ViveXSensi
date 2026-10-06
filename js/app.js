@@ -1,11 +1,76 @@
+/* ================================
+   MOBILE ONLY CHECK
+================================ */
+
+function isMobileDevice(){
+
+  const userAgent =
+    navigator.userAgent ||
+    navigator.vendor ||
+    window.opera;
+
+  return /android|iphone|ipad|ipod|mobile/i.test(
+    userAgent
+  );
+
+}
+
+
+/* ================================
+   BLOCK DESKTOP
+================================ */
+
+const IS_MOBILE =
+  isMobileDevice();
+
+
+if(!IS_MOBILE){
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+      const block =
+        document.getElementById(
+          "desktopBlock"
+        );
+
+      if(block){
+
+        block.style.display =
+          "flex";
+
+      }
+
+      document.body.style.overflow =
+        "hidden";
+
+    }
+  );
+
+}
+
+
+/* ================================
+   STATE
+================================ */
+
 const state = {
+
   brand: "",
+
   ram: "",
+
   storage: "",
+
   density: 0,
+
   screenWidth: 0,
+
   screenHeight: 0,
+
   dpr: 1
+
 };
 
 
@@ -13,7 +78,8 @@ const state = {
    HELPERS
 ================================ */
 
-const $ = (id) => document.getElementById(id);
+const $ = (id) =>
+  document.getElementById(id);
 
 
 /* ================================
@@ -21,21 +87,37 @@ const $ = (id) => document.getElementById(id);
 ================================ */
 
 const BRANDS = [
+
   "Samsung",
+
   "Realme",
+
   "Vivo",
+
   "OPPO",
+
   "Xiaomi",
+
   "OnePlus",
+
   "Motorola",
+
   "Infinix",
+
   "Tecno",
+
   "iQOO",
+
   "Apple",
+
   "POCO",
+
   "Nothing",
+
   "Honor",
+
   "Google Pixel"
+
 ];
 
 
@@ -44,21 +126,37 @@ const BRANDS = [
 ================================ */
 
 const BRAND_FACTOR = {
+
   "Samsung": 0,
+
   "Realme": 2,
+
   "Vivo": 2,
+
   "OPPO": 1,
+
   "Xiaomi": 3,
+
   "OnePlus": 4,
+
   "Motorola": 0,
+
   "Infinix": 3,
+
   "Tecno": 3,
+
   "iQOO": 5,
+
   "Apple": -3,
+
   "POCO": 4,
+
   "Nothing": 1,
+
   "Honor": 1,
+
   "Google Pixel": -2
+
 };
 
 
@@ -66,20 +164,32 @@ const BRAND_FACTOR = {
    NAVIGATION
 ================================ */
 
-function goTo(id) {
+function goTo(id){
 
   document
     .querySelectorAll(".screen")
     .forEach((screen) => {
-      screen.classList.remove("active");
+
+      screen.classList.remove(
+        "active"
+      );
+
     });
 
-  $(id).classList.add("active");
+
+  $(id).classList.add(
+    "active"
+  );
+
 
   window.scrollTo({
-    top: 0,
-    behavior: "smooth"
+
+    top:0,
+
+    behavior:"smooth"
+
   });
+
 }
 
 
@@ -87,18 +197,25 @@ function goTo(id) {
    LOAD BRANDS
 ================================ */
 
-function init() {
+function init(){
 
-  $("brandGrid").innerHTML = BRANDS
-    .map((brand) => `
-      <button
-        class="brand"
-        onclick="selectBrand('${brand}', this)"
-      >
-        ${brand}
-      </button>
-    `)
-    .join("");
+  $("brandGrid").innerHTML =
+
+    BRANDS
+      .map((brand) => `
+
+        <button
+          class="brand"
+          onclick="selectBrand('${brand}', this)"
+        >
+
+          ${brand}
+
+        </button>
+
+      `)
+      .join("");
+
 }
 
 
@@ -106,19 +223,34 @@ function init() {
    SELECT BRAND
 ================================ */
 
-function selectBrand(brand, element) {
+function selectBrand(
+  brand,
+  element
+){
 
-  state.brand = brand;
+  state.brand =
+    brand;
 
-  $("brandNext").disabled = false;
+
+  $("brandNext").disabled =
+    false;
+
 
   document
     .querySelectorAll(".brand")
     .forEach((item) => {
-      item.classList.remove("selected");
+
+      item.classList.remove(
+        "selected"
+      );
+
     });
 
-  element.classList.add("selected");
+
+  element.classList.add(
+    "selected"
+  );
+
 }
 
 
@@ -126,27 +258,48 @@ function selectBrand(brand, element) {
    DEVICE PAGE
 ================================ */
 
-function openDeviceStep() {
+function openDeviceStep(){
 
   $("selectedBrand").textContent =
     state.brand;
 
-  $("ramSelect").value = "";
-  $("storageSelect").value = "";
 
-  state.ram = "";
-  state.storage = "";
-  state.density = 0;
-  state.screenWidth = 0;
-  state.screenHeight = 0;
-  state.dpr = 1;
+  $("ramSelect").value =
+    "";
+
+  $("storageSelect").value =
+    "";
+
+
+  state.ram =
+    "";
+
+  state.storage =
+    "";
+
+  state.density =
+    0;
+
+  state.screenWidth =
+    0;
+
+  state.screenHeight =
+    0;
+
+  state.dpr =
+    1;
+
 
   $("densityText").textContent =
     "Not scanned yet";
 
-  $("deviceNext").disabled = true;
+
+  $("deviceNext").disabled =
+    true;
+
 
   goTo("device");
+
 }
 
 
@@ -154,43 +307,64 @@ function openDeviceStep() {
    SCREEN / DENSITY SCAN
 ================================ */
 
-function scanDensity() {
+function scanDensity(){
 
   const dpr =
     window.devicePixelRatio || 1;
 
+
   const width =
     Math.round(
-      window.screen.width * dpr
+      window.screen.width *
+      dpr
     );
+
 
   const height =
     Math.round(
-      window.screen.height * dpr
+      window.screen.height *
+      dpr
     );
 
-  /*
-    Browser actual Android system DPI
-    reliably detect nahi kar sakta.
 
-    Isliye DPR based estimated PPI.
+  /*
+    Browser actual Android
+    system DPI reliably detect
+    nahi kar sakta.
+
+    Isliye DPR based
+    estimated PPI.
   */
 
   const ppi =
-    Math.round(160 * dpr);
+    Math.round(
+      160 * dpr
+    );
 
 
-  state.density = ppi;
-  state.screenWidth = width;
-  state.screenHeight = height;
-  state.dpr = dpr;
+  state.density =
+    ppi;
+
+
+  state.screenWidth =
+    width;
+
+
+  state.screenHeight =
+    height;
+
+
+  state.dpr =
+    dpr;
 
 
   $("densityText").textContent =
+
     `Detected • ${width} × ${height} • ${dpr.toFixed(2)}x • ~${ppi} PPI`;
 
 
   updateNext();
+
 }
 
 
@@ -198,13 +372,14 @@ function scanDensity() {
    CHECK DEVICE BUTTON
 ================================ */
 
-function updateNext() {
+function updateNext(){
 
   $("deviceNext").disabled = !(
     state.ram &&
     state.storage &&
     state.density
   );
+
 }
 
 
@@ -212,9 +387,13 @@ function updateNext() {
    RAM
 ================================ */
 
-function getRam() {
+function getRam(){
 
-  return parseInt(state.ram) || 4;
+  return (
+    parseInt(state.ram) ||
+    4
+  );
+
 }
 
 
@@ -222,105 +401,130 @@ function getRam() {
    STORAGE
 ================================ */
 
-function getStorage() {
+function getStorage(){
 
-  if (!state.storage) {
+  if(!state.storage){
+
     return 64;
+
   }
 
-  if (state.storage.includes("TB")) {
+
+  if(
+    state.storage.includes("TB")
+  ){
 
     const tb =
       parseFloat(
         state.storage
       );
 
+
     return tb * 1024;
+
   }
 
-  return parseInt(
-    state.storage
-  ) || 64;
+
+  return (
+    parseInt(
+      state.storage
+    ) || 64
+  );
+
 }
 
 
 /* ================================
    RAM EFFECT
-================================
+================================ */
 
-   Total RAM effect ≈ 10 points.
+function getRamEffect(ram){
 
-   4GB  = +5
-   6GB  = +3
-   8GB  = +1
-   12GB = -1
-   16GB = -3
-   24GB = -5
-*/
+  if(ram <= 4){
 
-function getRamEffect(ram) {
-
-  if (ram <= 4) {
     return 5;
+
   }
 
-  if (ram <= 6) {
+
+  if(ram <= 6){
+
     return 3;
+
   }
 
-  if (ram <= 8) {
+
+  if(ram <= 8){
+
     return 1;
+
   }
 
-  if (ram <= 12) {
+
+  if(ram <= 12){
+
     return -1;
+
   }
 
-  if (ram <= 16) {
+
+  if(ram <= 16){
+
     return -3;
+
   }
+
 
   return -5;
+
 }
 
 
 /* ================================
    STORAGE EFFECT
-================================
+================================ */
 
-   Total Storage effect ≈ 10 points.
+function getStorageEffect(
+  storage
+){
 
-   32GB  = +5
-   64GB  = +3
-   128GB = +1
-   256GB = -1
-   512GB = -3
-   1TB   = -5
-*/
+  if(storage <= 32){
 
-function getStorageEffect(storage) {
-
-  if (storage <= 32) {
     return 5;
+
   }
 
-  if (storage <= 64) {
+
+  if(storage <= 64){
+
     return 3;
+
   }
 
-  if (storage <= 128) {
+
+  if(storage <= 128){
+
     return 1;
+
   }
 
-  if (storage <= 256) {
+
+  if(storage <= 256){
+
     return -1;
+
   }
 
-  if (storage <= 512) {
+
+  if(storage <= 512){
+
     return -3;
+
   }
+
 
   return -5;
+
 }
 
 
@@ -328,161 +532,192 @@ function getStorageEffect(storage) {
    DEVICE PROFILE
 ================================ */
 
-function getDeviceProfile() {
+function getDeviceProfile(){
 
   const ram =
     getRam();
 
+
   const storage =
     getStorage();
 
+
   const ppi =
     state.density || 320;
+
 
   const dpr =
     state.dpr || 1;
 
 
-  /* --------------------------------
-     RAM
-  -------------------------------- */
-
   const ramEffect =
-    getRamEffect(ram);
+    getRamEffect(
+      ram
+    );
 
-
-  /* --------------------------------
-     STORAGE
-  -------------------------------- */
 
   const storageEffect =
-    getStorageEffect(storage);
+    getStorageEffect(
+      storage
+    );
 
-
-  /* --------------------------------
-     SCREEN RESOLUTION
-  -------------------------------- */
 
   const pixels =
     state.screenWidth *
     state.screenHeight;
 
 
-  let resolutionFactor = 0;
+  let resolutionFactor =
+    0;
 
-  if (pixels >= 2000000) {
+
+  if(
+    pixels >= 2000000
+  ){
+
     resolutionFactor += 1;
+
   }
 
-  if (pixels >= 2500000) {
+
+  if(
+    pixels >= 2500000
+  ){
+
     resolutionFactor += 1;
+
   }
 
-  if (pixels >= 3000000) {
+
+  if(
+    pixels >= 3000000
+  ){
+
     resolutionFactor += 1;
+
   }
 
-  if (pixels >= 4000000) {
+
+  if(
+    pixels >= 4000000
+  ){
+
     resolutionFactor += 1;
+
   }
 
 
-  /* --------------------------------
-     PPI
-  -------------------------------- */
+  let ppiFactor =
+    0;
 
-  let ppiFactor = 0;
 
-  if (ppi >= 350) {
+  if(ppi >= 350){
+
     ppiFactor += 1;
+
   }
 
-  if (ppi >= 400) {
+
+  if(ppi >= 400){
+
     ppiFactor += 1;
+
   }
 
-  if (ppi >= 450) {
+
+  if(ppi >= 450){
+
     ppiFactor += 1;
+
   }
 
-  if (ppi >= 500) {
+
+  if(ppi >= 500){
+
     ppiFactor += 1;
+
   }
 
 
-  /* --------------------------------
-     DPR
-  -------------------------------- */
+  let dprFactor =
+    0;
 
-  let dprFactor = 0;
 
-  if (dpr >= 2.5) {
+  if(dpr >= 2.5){
+
     dprFactor += 1;
+
   }
 
-  if (dpr >= 3) {
+
+  if(dpr >= 3){
+
     dprFactor += 1;
+
   }
 
-  if (dpr >= 3.5) {
+
+  if(dpr >= 3.5){
+
     dprFactor += 1;
+
   }
 
-
-  /* --------------------------------
-     BRAND
-  -------------------------------- */
 
   const brandFactor =
-    BRAND_FACTOR[state.brand] || 0;
+    BRAND_FACTOR[
+      state.brand
+    ] || 0;
 
-
-  /* --------------------------------
-     DEVICE EFFECT
-  --------------------------------
-
-     Display/device factors main hain.
-  */
 
   const deviceFactor =
+
     resolutionFactor +
+
     ppiFactor +
+
     dprFactor +
+
     brandFactor;
 
 
-  /* --------------------------------
-     TOTAL EFFECT
-  --------------------------------
-
-     Device effect
-     + RAM effect
-     + Storage effect
-  */
-
   const totalFactor =
+
     deviceFactor +
+
     ramEffect +
+
     storageEffect;
 
 
   return {
+
     ram,
+
     storage,
+
     ppi,
+
     dpr,
 
     ramEffect,
+
     storageEffect,
 
     resolutionFactor,
+
     ppiFactor,
+
     dprFactor,
+
     brandFactor,
 
     deviceFactor,
+
     totalFactor
+
   };
+
 }
 
 
@@ -490,30 +725,16 @@ function getDeviceProfile() {
    GENERATE SENSITIVITY
 ================================ */
 
-function generateSensitivity() {
+function generateSensitivity(){
 
   const profile =
     getDeviceProfile();
 
 
-  /*
-    BASE
-
-    Device/display ka effect
-    strongly included hai.
-
-    RAM + Storage ka combined
-    maximum adjustment ~20 points.
-  */
-
   const base =
     145 +
     profile.totalFactor;
 
-
-  /* --------------------------------
-     GENERAL
-  -------------------------------- */
 
   const general =
     clamp(
@@ -523,10 +744,6 @@ function generateSensitivity() {
     );
 
 
-  /* --------------------------------
-     RED DOT
-  -------------------------------- */
-
   const redDot =
     clamp(
       base + 8,
@@ -534,10 +751,6 @@ function generateSensitivity() {
       195
     );
 
-
-  /* --------------------------------
-     2X
-  -------------------------------- */
 
   const scope2x =
     clamp(
@@ -547,10 +760,6 @@ function generateSensitivity() {
     );
 
 
-  /* --------------------------------
-     4X
-  -------------------------------- */
-
   const scope4x =
     clamp(
       base - 12,
@@ -559,10 +768,6 @@ function generateSensitivity() {
     );
 
 
-  /* --------------------------------
-     SNIPER
-  -------------------------------- */
-
   const sniper =
     clamp(
       base - 45,
@@ -570,10 +775,6 @@ function generateSensitivity() {
       140
     );
 
-
-  /* --------------------------------
-     FREE LOOK
-  -------------------------------- */
 
   const freeLook =
     clamp(
@@ -584,13 +785,21 @@ function generateSensitivity() {
 
 
   return {
+
     general,
+
     redDot,
+
     scope2x,
+
     scope4x,
+
     sniper,
+
     freeLook
+
   };
+
 }
 
 
@@ -598,15 +807,23 @@ function generateSensitivity() {
    CLAMP
 ================================ */
 
-function clamp(value, min, max) {
+function clamp(
+  value,
+  min,
+  max
+){
 
   return Math.max(
+
     min,
+
     Math.min(
       max,
       value
     )
+
   );
+
 }
 
 
@@ -614,72 +831,94 @@ function clamp(value, min, max) {
    SHOW RESULT
 ================================ */
 
-function showResult() {
+function showResult(){
 
   const profile =
     getDeviceProfile();
+
 
   const sensi =
     generateSensitivity();
 
 
-  /* --------------------------------
-     DEVICE INFO
-  -------------------------------- */
-
   $("resultBrand").textContent =
     state.brand;
+
 
   $("resultRam").textContent =
     state.ram;
 
+
   $("resultStorage").textContent =
     state.storage;
+
 
   $("resultDensity").textContent =
     `~${profile.ppi} PPI`;
 
 
-  /* --------------------------------
-     SENSITIVITY CARDS
-  -------------------------------- */
-
   const settings = [
 
-    ["General", sensi.general],
+    [
+      "General",
+      sensi.general
+    ],
 
-    ["Red Dot", sensi.redDot],
+    [
+      "Red Dot",
+      sensi.redDot
+    ],
 
-    ["2X Scope", sensi.scope2x],
+    [
+      "2X Scope",
+      sensi.scope2x
+    ],
 
-    ["4X Scope", sensi.scope4x],
+    [
+      "4X Scope",
+      sensi.scope4x
+    ],
 
-    ["Sniper Scope", sensi.sniper],
+    [
+      "Sniper Scope",
+      sensi.sniper
+    ],
 
-    ["Free Look", sensi.freeLook]
+    [
+      "Free Look",
+      sensi.freeLook
+    ]
 
   ];
 
 
   $("settingsGrid").innerHTML =
+
     settings
       .map(
-        ([name, value]) => `
+        ([name,value]) => `
+
           <div class="setting">
-            <small>${name}</small>
-            <strong>${value}</strong>
+
+            <small>
+              ${name}
+            </small>
+
+            <strong>
+              ${value}
+            </strong>
+
           </div>
+
         `
       )
       .join("");
 
 
-  /* --------------------------------
-     FIRE BUTTON
-  -------------------------------- */
-
   let fireButton =
+
     48 +
+
     Math.round(
       profile.totalFactor / 2
     );
@@ -697,22 +936,18 @@ function showResult() {
     `${fireButton}%`;
 
 
-  /* --------------------------------
-     RECOMMENDED DPI
-  --------------------------------
-
-     Device/display effect = main
-     RAM effect = small
-     Storage effect = small
-  */
-
   let recommendedDpi =
+
     380 +
+
     (
       profile.ppi - 320
     ) * 1.2 +
+
     profile.deviceFactor * 5 +
+
     profile.ramEffect * 3 +
+
     profile.storageEffect * 2;
 
 
@@ -735,6 +970,7 @@ function showResult() {
 
 
   goTo("result");
+
 }
 
 
@@ -742,33 +978,56 @@ function showResult() {
    RESTART
 ================================ */
 
-function restart() {
+function restart(){
 
-  state.brand = "";
-  state.ram = "";
-  state.storage = "";
-  state.density = 0;
-  state.screenWidth = 0;
-  state.screenHeight = 0;
-  state.dpr = 1;
+  state.brand =
+    "";
+
+  state.ram =
+    "";
+
+  state.storage =
+    "";
+
+  state.density =
+    0;
+
+  state.screenWidth =
+    0;
+
+  state.screenHeight =
+    0;
+
+  state.dpr =
+    1;
 
 
-  $("brandNext").disabled = true;
+  $("brandNext").disabled =
+    true;
 
 
   document
     .querySelectorAll(".brand")
     .forEach((item) => {
-      item.classList.remove("selected");
+
+      item.classList.remove(
+        "selected"
+      );
+
     });
 
 
   goTo("home");
+
 }
 
 
 /* ================================
-   START
+   START APP
 ================================ */
 
-init();
+if(IS_MOBILE){
+
+  init();
+
+}
