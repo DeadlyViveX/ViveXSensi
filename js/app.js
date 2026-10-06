@@ -1,48 +1,116 @@
-const API_URL =
-"https://script.google.com/macros/s/AKfycbzrRRiwN1uYSzAaSy9fQ6WM7b4XOcxbZGyX5JWsIyF91-fjWgi0sdMDXi-BKrWQrqmm2A/exec";
+/* =========================================
+   VIVEX SENSI
+   MAIN APP SCRIPT
+========================================= */
 
+
+/* =========================================
+   GOOGLE APPS SCRIPT URL
+========================================= */
+
+const VERIFY_API =
+  "https://script.google.com/macros/s/AKfycbxejo41XCZAECqxPviHVpiZnLdcLAEmVxEQ4utRRP47NAlol24sWuCbJjxeCVXMcOT3ng/exec";
+
+
+/* =========================================
+   BASIC HELPERS
+========================================= */
 
 function $(id){
   return document.getElementById(id);
 }
 
 
-// ================================
-// MOBILE CHECK
-// ================================
+/* =========================================
+   MOBILE CHECK
+========================================= */
 
 function isMobileDevice(){
 
-  const ua =
+  const userAgent =
     navigator.userAgent ||
     navigator.vendor ||
     window.opera;
 
-  return /android|iphone|ipad|ipod|mobile/i.test(ua);
+  return /android|iphone|ipad|ipod|mobile/i.test(
+    userAgent
+  );
 }
 
-const IS_MOBILE = isMobileDevice();
+const IS_MOBILE =
+  isMobileDevice();
+
 
 if(!IS_MOBILE){
 
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
-    const block = $("desktopBlock");
+      const block =
+        $("desktopBlock");
 
-    if(block){
-      block.style.display = "flex";
+      if(block){
+        block.style.display = "flex";
+      }
+
+      document.body.style.overflow =
+        "hidden";
+
     }
-
-    document.body.style.overflow = "hidden";
-
-  });
+  );
 
 }
 
 
-// ================================
-// STATE
-// ================================
+/* =========================================
+   DEVICE ID
+========================================= */
+
+function getDeviceId(){
+
+  let deviceId =
+    localStorage.getItem(
+      "vivex_device_id"
+    );
+
+  if(!deviceId){
+
+    if(
+      window.crypto &&
+      crypto.randomUUID
+    ){
+
+      deviceId =
+        crypto.randomUUID();
+
+    }
+    else{
+
+      deviceId =
+        "VX-" +
+        Date.now().toString(36) +
+        "-" +
+        Math.random()
+          .toString(36)
+          .substring(2,12);
+
+    }
+
+    localStorage.setItem(
+      "vivex_device_id",
+      deviceId
+    );
+
+  }
+
+  return deviceId;
+}
+
+
+/* =========================================
+   APP STATE
+========================================= */
 
 const state = {
 
@@ -60,9 +128,9 @@ const state = {
 };
 
 
-// ================================
-// BRANDS
-// ================================
+/* =========================================
+   BRANDS
+========================================= */
 
 const BRANDS = [
 
@@ -86,9 +154,9 @@ const BRANDS = [
 ];
 
 
-// ================================
-// BRAND FACTOR
-// ================================
+/* =========================================
+   BRAND FACTOR
+========================================= */
 
 const BRAND_FACTOR = {
 
@@ -96,99 +164,80 @@ const BRAND_FACTOR = {
   "Realme":2,
   "Vivo":2,
   "OPPO":1,
+
   "Xiaomi":3,
   "Redmi":3,
+
   "OnePlus":4,
+
   "Motorola":0,
+
   "Infinix":3,
   "Tecno":3,
+
   "iQOO":5,
+
   "Apple":-3,
+
   "POCO":4,
+
   "Nothing":1,
   "Honor":1,
+
   "Google Pixel":-2
 
 };
 
 
-// ================================
-// RAM FACTOR
-// ================================
+/* =========================================
+   RAM EFFECT
+   LOWER RAM = HIGHER SENSI
+========================================= */
 
-const RAM_FACTOR = {
+function getRamEffect(ram){
 
-  "4 GB":5,
-  "6 GB":3,
-  "8 GB":1,
-  "12 GB":-1,
-  "16 GB":-3,
-  "24 GB":-5
+  const values = {
 
-};
+    "4 GB":5,
+    "6 GB":3,
+    "8 GB":1,
 
+    "12 GB":-1,
+    "16 GB":-3,
+    "24 GB":-5
 
-// ================================
-// STORAGE FACTOR
-// ================================
+  };
 
-const STORAGE_FACTOR = {
-
-  "32 GB":5,
-  "64 GB":3,
-  "128 GB":1,
-  "256 GB":-1,
-  "512 GB":-3,
-  "1 TB":-5
-
-};
-
-
-// ================================
-// DEVICE ID
-// ================================
-
-function getDeviceId(){
-
-  const KEY =
-    "vivex_device_id";
-
-  let id =
-    localStorage.getItem(KEY);
-
-  if(id){
-    return id;
-  }
-
-  const random =
-    Math.random()
-      .toString(36)
-      .substring(2,10)
-      .toUpperCase();
-
-  const time =
-    Date.now()
-      .toString(36)
-      .toUpperCase();
-
-  id =
-    "VXDEV-" +
-    time +
-    "-" +
-    random;
-
-  localStorage.setItem(
-    KEY,
-    id
-  );
-
-  return id;
+  return values[ram] || 0;
 }
 
 
-// ================================
-// NAVIGATION
-// ================================
+/* =========================================
+   STORAGE EFFECT
+   LOWER STORAGE = HIGHER SENSI
+========================================= */
+
+function getStorageEffect(storage){
+
+  const values = {
+
+    "32 GB":5,
+    "64 GB":3,
+    "128 GB":1,
+
+    "256 GB":-1,
+    "512 GB":-3,
+    "1 TB":-5
+
+  };
+
+  return values[storage] || 0;
+}
+
+
+/* =========================================
+   NAVIGATION
+========================================= */
 
 function goTo(id){
 
@@ -196,99 +245,133 @@ function goTo(id){
     .querySelectorAll(".screen")
     .forEach(screen => {
 
-      screen.classList.remove("active");
+      screen.classList.remove(
+        "active"
+      );
 
     });
+
 
   const target =
     $(id);
 
   if(target){
 
-    target.classList.add("active");
-
-  }
-
-  window.scrollTo(0,0);
-
-}
-
-
-// ================================
-// INITIALIZE
-// ================================
-
-function init(){
-
-  const grid =
-    $("brandGrid");
-
-  if(!grid){
-    return;
-  }
-
-  grid.innerHTML = "";
-
-  BRANDS.forEach(brand => {
-
-    const button =
-      document.createElement("button");
-
-    button.type = "button";
-
-    button.className =
-      "brand-card";
-
-    button.textContent =
-      brand;
-
-    button.addEventListener(
-      "click",
-      () => selectBrand(brand)
+    target.classList.add(
+      "active"
     );
 
-    grid.appendChild(button);
+  }
 
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
   });
 
 }
 
 
-// ================================
-// BRAND SELECT
-// ================================
+/* =========================================
+   INITIALIZE
+========================================= */
 
-function selectBrand(brand){
+function init(){
 
-  state.brand =
-    brand;
+  const brandGrid =
+    $("brandGrid");
 
-  document
-    .querySelectorAll(".brand-card")
-    .forEach(card => {
+  if(!brandGrid){
+    return;
+  }
 
-      card.classList.toggle(
-        "selected",
-        card.textContent === brand
+
+  brandGrid.innerHTML = "";
+
+
+  BRANDS.forEach(
+    brand => {
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+      button.className =
+        "brand-btn";
+
+
+      button.type =
+        "button";
+
+
+      button.textContent =
+        brand;
+
+
+      button.onclick =
+        () => selectBrand(
+          brand,
+          button
+        );
+
+
+      brandGrid.appendChild(
+        button
       );
 
-    });
+    }
+  );
 
-  if($("selectedBrand")){
-
-    $("selectedBrand").textContent =
-      brand;
-
-  }
 
   updateNext();
 
 }
 
 
-// ================================
-// OPEN DEVICE
-// ================================
+/* =========================================
+   BRAND SELECTION
+========================================= */
+
+function selectBrand(
+  brand,
+  button
+){
+
+  state.brand =
+    brand;
+
+
+  document
+    .querySelectorAll(
+      ".brand-btn"
+    )
+    .forEach(btn => {
+
+      btn.classList.remove(
+        "selected"
+      );
+
+    });
+
+
+  if(button){
+
+    button.classList.add(
+      "selected"
+    );
+
+  }
+
+
+  updateNext();
+
+}
+
+
+/* =========================================
+   OPEN DEVICE PAGE
+========================================= */
 
 function openDeviceStep(){
 
@@ -296,101 +379,108 @@ function openDeviceStep(){
     return;
   }
 
-  if($("selectedBrand")){
 
-    $("selectedBrand").textContent =
-      state.brand;
+  $("selectedBrand")
+    .textContent =
+    state.brand;
 
-  }
 
   goTo("device");
 
 }
 
 
-// ================================
-// SCAN DENSITY
-// ================================
+/* =========================================
+   SCAN PIXEL DENSITY
+========================================= */
 
 function scanDensity(){
 
   const dpr =
     window.devicePixelRatio || 1;
 
+
   const width =
     Math.round(
       window.screen.width * dpr
     );
+
 
   const height =
     Math.round(
       window.screen.height * dpr
     );
 
+
+  /*
+   * Browser cannot reliably read
+   * actual Android system DPI.
+   *
+   * This is an estimated PPI.
+   */
+
   const ppi =
     Math.round(
       160 * dpr
     );
 
+
   state.density =
     ppi;
+
 
   state.screenWidth =
     width;
 
+
   state.screenHeight =
     height;
+
 
   state.dpr =
     dpr;
 
+
   if($("densityText")){
 
-    $("densityText").textContent =
+    $("densityText")
+      .textContent =
       `Detected • ${width} × ${height} • ${dpr.toFixed(2)}x • ~${ppi} PPI`;
 
   }
+
 
   updateNext();
 
 }
 
 
-// ================================
-// UPDATE BUTTONS
-// ================================
+/* =========================================
+   UPDATE NEXT BUTTON
+========================================= */
 
 function updateNext(){
 
-  if($("brandNext")){
+  const brandNext =
+    $("brandNext");
 
-    $("brandNext").disabled =
+
+  if(brandNext){
+
+    brandNext.disabled =
       !state.brand;
 
   }
 
 
-  if($("ramSelect")){
-
-    state.ram =
-      $("ramSelect").value;
-
-  }
+  const deviceNext =
+    $("deviceNext");
 
 
-  if($("storageSelect")){
+  if(deviceNext){
 
-    state.storage =
-      $("storageSelect").value;
-
-  }
-
-
-  if($("deviceNext")){
-
-    $("deviceNext").disabled =
+    deviceNext.disabled =
       !(
-        state.brand &&
         state.ram &&
         state.storage &&
         state.density
@@ -401,48 +491,76 @@ function updateNext(){
 }
 
 
-// ================================
-// PAYMENT / VERIFICATION
-// ================================
+/* =========================================
+   OPEN VERIFICATION
+========================================= */
 
 function openVerification(){
 
-  goTo("verification");
+  if(
+    !state.ram ||
+    !state.storage ||
+    !state.density
+  ){
+
+    return;
+
+  }
+
+
+  goTo(
+    "verification"
+  );
 
 }
 
+
+/* =========================================
+   OPEN PAYMENT
+========================================= */
 
 function openPayment(){
 
-  goTo("payment");
+  goTo(
+    "payment"
+  );
 
 }
 
+
+/* =========================================
+   OPEN CONFIRMATION
+========================================= */
 
 function openConfirmation(){
 
-  goTo("confirmation");
+  goTo(
+    "confirmation"
+  );
 
 }
 
 
-// ================================
-// VERIFY CODE
-// ================================
+/* =========================================
+   UNIQUE DEVICE VERIFICATION
+========================================= */
 
 function verifyCode(){
 
   const input =
     $("verificationCode");
 
+
   if(!input){
     return;
   }
+
 
   const code =
     input.value
       .trim()
       .toUpperCase();
+
 
   if(!code){
 
@@ -459,9 +577,213 @@ function verifyCode(){
     getDeviceId();
 
 
+  showVerificationLoading();
+
+
+  verifyCodeWithServer(
+    code,
+    deviceId
+  );
+
+}
+
+
+/* =========================================
+   GOOGLE APPS SCRIPT VERIFICATION
+========================================= */
+
+function verifyCodeWithServer(
+  code,
+  deviceId
+){
+
+  /*
+   * JSONP is used because the
+   * website is hosted separately
+   * from Google Apps Script.
+   */
+
+  const callbackName =
+    "vivexCallback_" +
+    Date.now() +
+    "_" +
+    Math.floor(
+      Math.random() * 100000
+    );
+
+
+  let finished =
+    false;
+
+
+  const script =
+    document.createElement(
+      "script"
+    );
+
+
+  function cleanup(){
+
+    if(script.parentNode){
+
+      script.parentNode.removeChild(
+        script
+      );
+
+    }
+
+
+    try{
+
+      delete window[
+        callbackName
+      ];
+
+    }
+    catch(error){
+
+      window[
+        callbackName
+      ] = undefined;
+
+    }
+
+  }
+
+
+  const timeout =
+    setTimeout(
+      () => {
+
+        if(finished){
+          return;
+        }
+
+
+        finished = true;
+
+
+        cleanup();
+
+
+        hideVerificationLoading();
+
+
+        showErrorPopup(
+          "Verification server did not respond. Please try again."
+        );
+
+      },
+      15000
+    );
+
+
+  window[
+    callbackName
+  ] = function(result){
+
+    if(finished){
+      return;
+    }
+
+
+    finished = true;
+
+
+    clearTimeout(
+      timeout
+    );
+
+
+    cleanup();
+
+
+    hideVerificationLoading();
+
+
+    if(
+      result &&
+      result.success
+    ){
+
+      showResult();
+
+    }
+    else{
+
+      showErrorPopup(
+        result &&
+        result.message
+          ? result.message
+          : "Invalid verification code."
+      );
+
+    }
+
+  };
+
+
+  const url =
+    VERIFY_API +
+    "?code=" +
+    encodeURIComponent(code) +
+    "&device=" +
+    encodeURIComponent(deviceId) +
+    "&callback=" +
+    encodeURIComponent(
+      callbackName
+    );
+
+
+  script.src =
+    url;
+
+
+  script.onerror =
+    () => {
+
+      if(finished){
+        return;
+      }
+
+
+      finished = true;
+
+
+      clearTimeout(
+        timeout
+      );
+
+
+      cleanup();
+
+
+      hideVerificationLoading();
+
+
+      showErrorPopup(
+        "Unable to connect to verification server."
+      );
+
+    };
+
+
+  document.body.appendChild(
+    script
+  );
+
+}
+
+
+/* =========================================
+   VERIFICATION LOADING
+========================================= */
+
+function showVerificationLoading(){
+
   const button =
     document.querySelector(
-      "#verification .primary"
+      '#verification .primary'
     );
 
 
@@ -470,485 +792,108 @@ function verifyCode(){
     button.disabled =
       true;
 
+
+    button.dataset.oldText =
+      button.innerHTML;
+
+
     button.innerHTML =
-      "Checking...";
+      "Verifying...";
 
   }
-
-
-  const callback =
-    "vivexVerify_" +
-    Date.now();
-
-
-  window[callback] =
-    function(result){
-
-      if(
-        result &&
-        result.success
-      ){
-
-        showResult();
-
-      }
-      else{
-
-        showErrorPopup(
-          result?.message ||
-          "Invalid verification code."
-        );
-
-      }
-
-
-      if(button){
-
-        button.disabled =
-          false;
-
-        button.innerHTML =
-          "Verify <b>✓</b>";
-
-      }
-
-
-      try{
-
-        delete window[callback];
-
-      }
-      catch(e){}
-
-    };
-
-
-  const script =
-    document.createElement("script");
-
-
-  const params =
-    new URLSearchParams();
-
-  params.set(
-    "code",
-    code
-  );
-
-  params.set(
-    "device",
-    deviceId
-  );
-
-  params.set(
-    "callback",
-    callback
-  );
-
-
-  script.src =
-    API_URL +
-    "?" +
-    params.toString();
-
-
-  script.onerror =
-    function(){
-
-      showErrorPopup(
-        "Connection failed. Please try again."
-      );
-
-
-      if(button){
-
-        button.disabled =
-          false;
-
-        button.innerHTML =
-          "Verify <b>✓</b>";
-
-      }
-
-    };
-
-
-  document.body.appendChild(script);
-
-
-  setTimeout(() => {
-
-    try{
-      script.remove();
-    }
-    catch(e){}
-
-  },10000);
 
 }
 
 
-// ================================
-// POPUP
-// ================================
+/* =========================================
+   HIDE VERIFICATION LOADING
+========================================= */
 
-function showErrorPopup(message){
+function hideVerificationLoading(){
 
-  if($("popupMessage")){
+  const button =
+    document.querySelector(
+      '#verification .primary'
+    );
 
-    $("popupMessage").textContent =
+
+  if(button){
+
+    button.disabled =
+      false;
+
+
+    if(button.dataset.oldText){
+
+      button.innerHTML =
+        button.dataset.oldText;
+
+    }
+
+  }
+
+}
+
+
+/* =========================================
+   ERROR POPUP
+========================================= */
+
+function showErrorPopup(
+  message
+){
+
+  const popup =
+    $("customPopup");
+
+
+  const messageBox =
+    $("popupMessage");
+
+
+  if(messageBox){
+
+    messageBox.textContent =
       message;
 
   }
 
-  if($("customPopup")){
 
-    $("customPopup")
-      .classList
-      .add("show");
+  if(popup){
 
-  }
-
-}
-
-
-function closeErrorPopup(){
-
-  if($("customPopup")){
-
-    $("customPopup")
-      .classList
-      .remove("show");
-
-  }
-
-}
-
-
-// ================================
-// DEVICE FACTOR
-// ================================
-
-function calculateDeviceFactor(){
-
-  let factor = 0;
-
-
-  const pixels =
-    state.screenWidth *
-    state.screenHeight;
-
-
-  if(pixels >= 2500000){
-    factor += 4;
-  }
-  else if(pixels >= 2000000){
-    factor += 3;
-  }
-  else if(pixels >= 1500000){
-    factor += 2;
-  }
-  else if(pixels >= 1000000){
-    factor += 1;
-  }
-
-
-  if(state.density >= 500){
-    factor += 4;
-  }
-  else if(state.density >= 420){
-    factor += 3;
-  }
-  else if(state.density >= 360){
-    factor += 2;
-  }
-  else if(state.density >= 300){
-    factor += 1;
-  }
-
-
-  if(state.dpr >= 4){
-    factor += 3;
-  }
-  else if(state.dpr >= 3){
-    factor += 2;
-  }
-  else if(state.dpr >= 2){
-    factor += 1;
-  }
-
-
-  return Math.min(
-    factor,
-    11
-  );
-
-}
-
-
-// ================================
-// CLAMP
-// ================================
-
-function clamp(
-  value,
-  min,
-  max
-){
-
-  return Math.min(
-    Math.max(
-      value,
-      min
-    ),
-    max
-  );
-
-}
-
-
-// ================================
-// CALCULATE SETTINGS
-// ================================
-
-function calculateSettings(){
-
-  const brand =
-    BRAND_FACTOR[state.brand] || 0;
-
-  const ram =
-    RAM_FACTOR[state.ram] || 0;
-
-  const storage =
-    STORAGE_FACTOR[state.storage] || 0;
-
-  const device =
-    calculateDeviceFactor();
-
-  const total =
-    brand +
-    ram +
-    storage +
-    device;
-
-
-  const base =
-    145 + total;
-
-
-  return {
-
-    general:
-      clamp(
-        base + 15,
-        100,
-        200
-      ),
-
-    redDot:
-      clamp(
-        base + 8,
-        90,
-        195
-      ),
-
-    twoX:
-      clamp(
-        base,
-        80,
-        190
-      ),
-
-    fourX:
-      clamp(
-        base - 12,
-        70,
-        180
-      ),
-
-    sniper:
-      clamp(
-        base - 45,
-        40,
-        140
-      ),
-
-    freeLook:
-      clamp(
-        base + 4,
-        90,
-        195
-      ),
-
-    fireButton:
-      clamp(
-        48 +
-        Math.round(total / 2),
-        45,
-        55
-      ),
-
-    dpi:
-      clamp(
-        Math.round(
-          380 +
-          (state.density - 320) * 1.2 +
-          device * 5 +
-          ram * 3 +
-          storage * 2
-        ),
-        320,
-        560
-      )
-
-  };
-
-}
-
-
-// ================================
-// SHOW RESULT
-// ================================
-
-function showResult(){
-
-  const s =
-    calculateSettings();
-
-
-  if($("resultBrand"))
-    $("resultBrand").textContent =
-      state.brand;
-
-
-  if($("resultRam"))
-    $("resultRam").textContent =
-      state.ram;
-
-
-  if($("resultStorage"))
-    $("resultStorage").textContent =
-      state.storage;
-
-
-  if($("resultDensity"))
-    $("resultDensity").textContent =
-      `~${state.density} PPI`;
-
-
-  const grid =
-    $("settingsGrid");
-
-
-  if(grid){
-
-    grid.innerHTML = "";
-
-
-    const list = [
-
-      ["GENERAL",s.general],
-      ["RED DOT",s.redDot],
-      ["2X SCOPE",s.twoX],
-      ["4X SCOPE",s.fourX],
-      ["SNIPER",s.sniper],
-      ["FREE LOOK",s.freeLook]
-
-    ];
-
-
-    list.forEach(
-      ([name,value]) => {
-
-        const card =
-          document.createElement("div");
-
-        card.className =
-          "setting-card";
-
-        card.innerHTML = `
-          <small>${name}</small>
-          <strong>${value}</strong>
-        `;
-
-        grid.appendChild(card);
-
-      }
+    popup.classList.add(
+      "show"
     );
 
   }
 
-
-  if($("fireButton"))
-    $("fireButton").textContent =
-      `${s.fireButton}%`;
+}
 
 
-  if($("dpi"))
-    $("dpi").textContent =
-      s.dpi;
+/* =========================================
+   CLOSE ERROR POPUP
+========================================= */
+
+function closeErrorPopup(){
+
+  const popup =
+    $("customPopup");
 
 
-  goTo("result");
+  if(popup){
+
+    popup.classList.remove(
+      "show"
+    );
+
+  }
 
 }
 
 
-// ================================
-// RESTART
-// ================================
-
-function restart(){
-
-  state.brand = "";
-  state.ram = "";
-  state.storage = "";
-
-  state.density = 0;
-
-  state.screenWidth = 0;
-  state.screenHeight = 0;
-  state.dpr = 1;
-
-
-  document
-    .querySelectorAll(".brand-card")
-    .forEach(card => {
-
-      card.classList.remove(
-        "selected"
-      );
-
-    });
-
-
-  if($("ramSelect"))
-    $("ramSelect").value = "";
-
-
-  if($("storageSelect"))
-    $("storageSelect").value = "";
-
-
-  if($("densityText"))
-    $("densityText").textContent =
-      "Not scanned yet";
-
-
-  if($("verificationCode"))
-    $("verificationCode").value = "";
-
-
-  updateNext();
-
-  goTo("home");
-
-}
-
-
-// ================================
-// POPUP OUTSIDE CLICK
-// ================================
+/* =========================================
+   CLOSE POPUP ON BACKDROP
+========================================= */
 
 document.addEventListener(
   "click",
@@ -956,6 +901,7 @@ document.addEventListener(
 
     const popup =
       $("customPopup");
+
 
     if(
       popup &&
@@ -970,23 +916,609 @@ document.addEventListener(
 );
 
 
-// ================================
-// START
-// ================================
+/* =========================================
+   CALCULATE SETTINGS
+========================================= */
 
-if(
-  document.readyState ===
-  "loading"
+function calculateSettings(){
+
+  const ramEffect =
+    getRamEffect(
+      state.ram
+    );
+
+
+  const storageEffect =
+    getStorageEffect(
+      state.storage
+    );
+
+
+  const brandEffect =
+    BRAND_FACTOR[
+      state.brand
+    ] || 0;
+
+
+  /*
+   * Resolution factor
+   */
+
+  const resolution =
+    state.screenWidth *
+    state.screenHeight;
+
+
+  let resolutionFactor =
+    0;
+
+
+  if(
+    resolution >=
+    2400000
+  ){
+
+    resolutionFactor =
+      4;
+
+  }
+  else if(
+    resolution >=
+    1800000
+  ){
+
+    resolutionFactor =
+      3;
+
+  }
+  else if(
+    resolution >=
+    1400000
+  ){
+
+    resolutionFactor =
+      2;
+
+  }
+  else if(
+    resolution >=
+    900000
+  ){
+
+    resolutionFactor =
+      1;
+
+  }
+
+
+  /*
+   * PPI factor
+   */
+
+  let ppiFactor =
+    0;
+
+
+  if(
+    state.density >=
+    500
+  ){
+
+    ppiFactor =
+      4;
+
+  }
+  else if(
+    state.density >=
+    420
+  ){
+
+    ppiFactor =
+      3;
+
+  }
+  else if(
+    state.density >=
+    350
+  ){
+
+    ppiFactor =
+      2;
+
+  }
+  else if(
+    state.density >=
+    280
+  ){
+
+    ppiFactor =
+      1;
+
+  }
+
+
+  /*
+   * DPR factor
+   */
+
+  let dprFactor =
+    Math.round(
+      (state.dpr - 1) * 2
+    );
+
+
+  dprFactor =
+    Math.max(
+      0,
+      Math.min(
+        3,
+        dprFactor
+      )
+    );
+
+
+  /*
+   * Total device factor
+   */
+
+  const totalFactor =
+    resolutionFactor +
+    ppiFactor +
+    dprFactor +
+    brandEffect +
+    ramEffect +
+    storageEffect;
+
+
+  /*
+   * Base sensitivity
+   */
+
+  const base =
+    145 +
+    totalFactor;
+
+
+  const settings = {
+
+    general:
+      clamp(
+        Math.round(
+          base + 15
+        ),
+        100,
+        200
+      ),
+
+    redDot:
+      clamp(
+        Math.round(
+          base + 8
+        ),
+        90,
+        195
+      ),
+
+    twoX:
+      clamp(
+        Math.round(
+          base
+        ),
+        80,
+        190
+      ),
+
+    fourX:
+      clamp(
+        Math.round(
+          base - 12
+        ),
+        70,
+        180
+      ),
+
+    sniper:
+      clamp(
+        Math.round(
+          base - 45
+        ),
+        40,
+        140
+      ),
+
+    freeLook:
+      clamp(
+        Math.round(
+          base + 4
+        ),
+        90,
+        195
+      )
+
+  };
+
+
+  /*
+   * Fire button
+   */
+
+  const fireButton =
+    clamp(
+      Math.round(
+        48 +
+        totalFactor / 2
+      ),
+      45,
+      55
+    );
+
+
+  /*
+   * Recommended DPI
+   */
+
+  let dpi =
+    380 +
+    (
+      state.density -
+      320
+    ) * 1.2 +
+    (
+      resolutionFactor +
+      ppiFactor +
+      dprFactor
+    ) * 5 +
+    ramEffect * 3 +
+    storageEffect * 2;
+
+
+  dpi =
+    clamp(
+      Math.round(dpi),
+      320,
+      560
+    );
+
+
+  return {
+
+    settings,
+    fireButton,
+    dpi
+
+  };
+
+}
+
+
+/* =========================================
+   CLAMP
+========================================= */
+
+function clamp(
+  value,
+  min,
+  max
 ){
 
-  document.addEventListener(
-    "DOMContentLoaded",
-    init
+  return Math.max(
+    min,
+    Math.min(
+      max,
+      value
+    )
   );
 
 }
-else{
 
-  init();
+
+/* =========================================
+   SHOW RESULT
+========================================= */
+
+function showResult(){
+
+  const result =
+    calculateSettings();
+
+
+  /*
+   * Brand
+   */
+
+  if($("resultBrand")){
+
+    $("resultBrand")
+      .textContent =
+      state.brand;
+
+  }
+
+
+  /*
+   * RAM
+   */
+
+  if($("resultRam")){
+
+    $("resultRam")
+      .textContent =
+      state.ram;
+
+  }
+
+
+  /*
+   * Storage
+   */
+
+  if($("resultStorage")){
+
+    $("resultStorage")
+      .textContent =
+      state.storage;
+
+  }
+
+
+  /*
+   * Density
+   */
+
+  if($("resultDensity")){
+
+    $("resultDensity")
+      .textContent =
+      "~" +
+      state.density +
+      " PPI";
+
+  }
+
+
+  /*
+   * Settings
+   */
+
+  const settingsGrid =
+    $("settingsGrid");
+
+
+  if(settingsGrid){
+
+    settingsGrid.innerHTML = `
+
+      <div class="setting-card">
+        <small>GENERAL</small>
+        <strong>
+          ${result.settings.general}
+        </strong>
+      </div>
+
+      <div class="setting-card">
+        <small>RED DOT</small>
+        <strong>
+          ${result.settings.redDot}
+        </strong>
+      </div>
+
+      <div class="setting-card">
+        <small>2X SCOPE</small>
+        <strong>
+          ${result.settings.twoX}
+        </strong>
+      </div>
+
+      <div class="setting-card">
+        <small>4X SCOPE</small>
+        <strong>
+          ${result.settings.fourX}
+        </strong>
+      </div>
+
+      <div class="setting-card">
+        <small>SNIPER</small>
+        <strong>
+          ${result.settings.sniper}
+        </strong>
+      </div>
+
+      <div class="setting-card">
+        <small>FREE LOOK</small>
+        <strong>
+          ${result.settings.freeLook}
+        </strong>
+      </div>
+
+    `;
+
+  }
+
+
+  /*
+   * Fire Button
+   */
+
+  if($("fireButton")){
+
+    $("fireButton")
+      .textContent =
+      result.fireButton +
+      "%";
+
+  }
+
+
+  /*
+   * DPI
+   */
+
+  if($("dpi")){
+
+    $("dpi")
+      .textContent =
+      result.dpi;
+
+  }
+
+
+  goTo(
+    "result"
+  );
 
 }
+
+
+/* =========================================
+   RESTART
+========================================= */
+
+function restart(){
+
+  state.brand = "";
+  state.ram = "";
+  state.storage = "";
+
+  state.density = 0;
+
+  state.screenWidth = 0;
+  state.screenHeight = 0;
+
+  state.dpr = 1;
+
+
+  /*
+   * Reset brand buttons
+   */
+
+  document
+    .querySelectorAll(
+      ".brand-btn"
+    )
+    .forEach(btn => {
+
+      btn.classList.remove(
+        "selected"
+      );
+
+    });
+
+
+  /*
+   * Reset RAM
+   */
+
+  if($("ramSelect")){
+
+    $("ramSelect")
+      .value = "";
+
+  }
+
+
+  /*
+   * Reset storage
+   */
+
+  if($("storageSelect")){
+
+    $("storageSelect")
+      .value = "";
+
+  }
+
+
+  /*
+   * Reset density
+   */
+
+  if($("densityText")){
+
+    $("densityText")
+      .textContent =
+      "Not scanned yet";
+
+  }
+
+
+  /*
+   * Reset verification input
+   */
+
+  if($("verificationCode")){
+
+    $("verificationCode")
+      .value = "";
+
+  }
+
+
+  updateNext();
+
+
+  goTo(
+    "home"
+  );
+
+}
+
+
+/* =========================================
+   ENTER KEY FOR VERIFICATION
+========================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    const input =
+      $("verificationCode");
+
+
+    if(input){
+
+      input.addEventListener(
+        "keydown",
+        event => {
+
+          if(
+            event.key ===
+            "Enter"
+          ){
+
+            verifyCode();
+
+          }
+
+        }
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================
+   START APP
+========================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    /*
+     * Create device ID immediately.
+     */
+
+    getDeviceId();
+
+
+    /*
+     * Initialize app.
+     */
+
+    init();
+
+  }
+);
