@@ -800,8 +800,40 @@ select:focus{
   }
 
   .app{
+    width:100%;
+    max-width:1100px;
+    min-height:100dvh;
+    margin:auto;
+    padding:40px 50px;
     background:#080808;
     box-shadow:0 0 80px #000;
   }
 
+  .screen{
+    width:100%;
+    max-width:1000px;
+    margin:auto;
   }
+
+  /* Desktop brand layout */
+  .brand-grid{
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+  }
+
+  .brand{
+    min-height:65px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    font-size:15px;
+  }
+
+  /* Desktop home ko centered rakho */
+  #home{
+    max-width:600px;
+    margin:auto;
+  }
+
+}
