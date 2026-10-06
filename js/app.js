@@ -1,65 +1,48 @@
-// ==========================================
-// ViveX Sensi - Main JavaScript
-// ==========================================
-
-
-// ==========================================
-// APPS SCRIPT WEB APP URL
-// ==========================================
-
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbzrRRiwN1uYSzAaSy9fQ6WM7b4XOcxbZGyX5JWsIyF91-fjWgi0sdMDXi-BKrWQrqmm2A/exec";
+"https://script.google.com/macros/s/AKfycbzrRRiwN1uYSzAaSy9fQ6WM7b4XOcxbZGyX5JWsIyF91-fjWgi0sdMDXi-BKrWQrqmm2A/exec";
 
-
-// ==========================================
-// MOBILE CHECK
-// ==========================================
-
-function isMobileDevice(){
-
-  const userAgent =
-    navigator.userAgent ||
-    navigator.vendor ||
-    window.opera;
-
-  return /android|iphone|ipad|ipod|mobile/i.test(
-    userAgent
-  );
-}
-
-const IS_MOBILE = isMobileDevice();
-
-if(!IS_MOBILE){
-
-  document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-      const block =
-        document.getElementById("desktopBlock");
-
-      if(block){
-        block.style.display = "flex";
-      }
-
-      document.body.style.overflow = "hidden";
-    }
-  );
-}
-
-
-// ==========================================
-// SHORT SELECTOR
-// ==========================================
 
 function $(id){
   return document.getElementById(id);
 }
 
 
-// ==========================================
-// DEVICE / USER STATE
-// ==========================================
+// ================================
+// MOBILE CHECK
+// ================================
+
+function isMobileDevice(){
+
+  const ua =
+    navigator.userAgent ||
+    navigator.vendor ||
+    window.opera;
+
+  return /android|iphone|ipad|ipod|mobile/i.test(ua);
+}
+
+const IS_MOBILE = isMobileDevice();
+
+if(!IS_MOBILE){
+
+  document.addEventListener("DOMContentLoaded", () => {
+
+    const block = $("desktopBlock");
+
+    if(block){
+      block.style.display = "flex";
+    }
+
+    document.body.style.overflow = "hidden";
+
+  });
+
+}
+
+
+// ================================
+// STATE
+// ================================
 
 const state = {
 
@@ -77,9 +60,9 @@ const state = {
 };
 
 
-// ==========================================
+// ================================
 // BRANDS
-// ==========================================
+// ================================
 
 const BRANDS = [
 
@@ -103,9 +86,9 @@ const BRANDS = [
 ];
 
 
-// ==========================================
+// ================================
 // BRAND FACTOR
-// ==========================================
+// ================================
 
 const BRAND_FACTOR = {
 
@@ -129,10 +112,9 @@ const BRAND_FACTOR = {
 };
 
 
-// ==========================================
+// ================================
 // RAM FACTOR
-// Lower RAM = Higher Sensitivity
-// ==========================================
+// ================================
 
 const RAM_FACTOR = {
 
@@ -146,10 +128,9 @@ const RAM_FACTOR = {
 };
 
 
-// ==========================================
+// ================================
 // STORAGE FACTOR
-// Lower Storage = Higher Sensitivity
-// ==========================================
+// ================================
 
 const STORAGE_FACTOR = {
 
@@ -163,64 +144,51 @@ const STORAGE_FACTOR = {
 };
 
 
-// ==========================================
+// ================================
 // DEVICE ID
-// ==========================================
-//
-// Browser-generated ID.
-// It is stored in localStorage so the same
-// browser/device can reuse the same ID.
-//
-// IMPORTANT:
-// This is NOT a permanent hardware ID.
-// Clearing browser data can create a new ID.
-//
+// ================================
 
 function getDeviceId(){
 
-  const STORAGE_KEY =
+  const KEY =
     "vivex_device_id";
 
-  let deviceId =
-    localStorage.getItem(STORAGE_KEY);
+  let id =
+    localStorage.getItem(KEY);
 
-  if(deviceId){
-    return deviceId;
+  if(id){
+    return id;
   }
 
-  const randomPart =
+  const random =
     Math.random()
       .toString(36)
       .substring(2,10)
       .toUpperCase();
 
-  const timePart =
+  const time =
     Date.now()
       .toString(36)
       .toUpperCase();
 
-  deviceId =
+  id =
     "VXDEV-" +
-    timePart +
+    time +
     "-" +
-    randomPart;
+    random;
 
   localStorage.setItem(
-    STORAGE_KEY,
-    deviceId
+    KEY,
+    id
   );
 
-  return deviceId;
+  return id;
 }
 
 
-// Create device ID immediately
-const DEVICE_ID = getDeviceId();
-
-
-// ==========================================
+// ================================
 // NAVIGATION
-// ==========================================
+// ================================
 
 function goTo(id){
 
@@ -241,56 +209,54 @@ function goTo(id){
 
   }
 
-  window.scrollTo({
-    top:0,
-    behavior:"smooth"
+  window.scrollTo(0,0);
+
+}
+
+
+// ================================
+// INITIALIZE
+// ================================
+
+function init(){
+
+  const grid =
+    $("brandGrid");
+
+  if(!grid){
+    return;
+  }
+
+  grid.innerHTML = "";
+
+  BRANDS.forEach(brand => {
+
+    const button =
+      document.createElement("button");
+
+    button.type = "button";
+
+    button.className =
+      "brand-card";
+
+    button.textContent =
+      brand;
+
+    button.addEventListener(
+      "click",
+      () => selectBrand(brand)
+    );
+
+    grid.appendChild(button);
+
   });
 
 }
 
 
-// ==========================================
-// INITIALIZE
-// ==========================================
-
-function init(){
-
-  const brandGrid =
-    $("brandGrid");
-
-  if(brandGrid){
-
-    brandGrid.innerHTML = "";
-
-    BRANDS.forEach(brand => {
-
-      const button =
-        document.createElement("button");
-
-      button.className =
-        "brand-card";
-
-      button.type =
-        "button";
-
-      button.textContent =
-        brand;
-
-      button.onclick = () =>
-        selectBrand(brand);
-
-      brandGrid.appendChild(button);
-
-    });
-
-  }
-
-}
-
-
-// ==========================================
-// BRAND SELECTION
-// ==========================================
+// ================================
+// BRAND SELECT
+// ================================
 
 function selectBrand(brand){
 
@@ -308,12 +274,9 @@ function selectBrand(brand){
 
     });
 
-  const selectedBrand =
-    $("selectedBrand");
+  if($("selectedBrand")){
 
-  if(selectedBrand){
-
-    selectedBrand.textContent =
+    $("selectedBrand").textContent =
       brand;
 
   }
@@ -323,9 +286,9 @@ function selectBrand(brand){
 }
 
 
-// ==========================================
-// OPEN DEVICE STEP
-// ==========================================
+// ================================
+// OPEN DEVICE
+// ================================
 
 function openDeviceStep(){
 
@@ -333,12 +296,9 @@ function openDeviceStep(){
     return;
   }
 
-  const selectedBrand =
-    $("selectedBrand");
+  if($("selectedBrand")){
 
-  if(selectedBrand){
-
-    selectedBrand.textContent =
+    $("selectedBrand").textContent =
       state.brand;
 
   }
@@ -348,9 +308,9 @@ function openDeviceStep(){
 }
 
 
-// ==========================================
-// SCAN PIXEL DENSITY
-// ==========================================
+// ================================
+// SCAN DENSITY
+// ================================
 
 function scanDensity(){
 
@@ -384,13 +344,9 @@ function scanDensity(){
   state.dpr =
     dpr;
 
+  if($("densityText")){
 
-  const densityText =
-    $("densityText");
-
-  if(densityText){
-
-    densityText.textContent =
+    $("densityText").textContent =
       `Detected • ${width} × ${height} • ${dpr.toFixed(2)}x • ~${ppi} PPI`;
 
   }
@@ -400,47 +356,39 @@ function scanDensity(){
 }
 
 
-// ==========================================
-// CHECK NEXT BUTTON
-// ==========================================
+// ================================
+// UPDATE BUTTONS
+// ================================
 
 function updateNext(){
 
-  const brandNext =
-    $("brandNext");
+  if($("brandNext")){
 
-  if(brandNext){
-
-    brandNext.disabled =
+    $("brandNext").disabled =
       !state.brand;
 
   }
 
 
-  const ram =
-    $("ramSelect")
-      ? $("ramSelect").value
-      : "";
+  if($("ramSelect")){
 
-  const storage =
-    $("storageSelect")
-      ? $("storageSelect").value
-      : "";
+    state.ram =
+      $("ramSelect").value;
+
+  }
 
 
-  state.ram =
-    ram;
+  if($("storageSelect")){
 
-  state.storage =
-    storage;
+    state.storage =
+      $("storageSelect").value;
+
+  }
 
 
-  const deviceNext =
-    $("deviceNext");
+  if($("deviceNext")){
 
-  if(deviceNext){
-
-    deviceNext.disabled =
+    $("deviceNext").disabled =
       !(
         state.brand &&
         state.ram &&
@@ -453,9 +401,9 @@ function updateNext(){
 }
 
 
-// ==========================================
-// OPEN VERIFICATION
-// ==========================================
+// ================================
+// PAYMENT / VERIFICATION
+// ================================
 
 function openVerification(){
 
@@ -464,20 +412,12 @@ function openVerification(){
 }
 
 
-// ==========================================
-// OPEN PAYMENT
-// ==========================================
-
 function openPayment(){
 
   goTo("payment");
 
 }
 
-
-// ==========================================
-// OPEN CONFIRMATION
-// ==========================================
 
 function openConfirmation(){
 
@@ -486,21 +426,9 @@ function openConfirmation(){
 }
 
 
-// ==========================================
-// UNIQUE CODE VERIFICATION
-// ==========================================
-//
-// Code is checked through Google Apps Script.
-//
-// First successful verification:
-//     Code + Device ID saved in Google Sheet.
-//
-// Same device later:
-//     Allowed.
-//
-// Different device:
-//     Blocked.
-//
+// ================================
+// VERIFY CODE
+// ================================
 
 function verifyCode(){
 
@@ -511,12 +439,10 @@ function verifyCode(){
     return;
   }
 
-
   const code =
     input.value
       .trim()
       .toUpperCase();
-
 
   if(!code){
 
@@ -525,6 +451,7 @@ function verifyCode(){
     );
 
     return;
+
   }
 
 
@@ -532,76 +459,63 @@ function verifyCode(){
     getDeviceId();
 
 
-  // Prevent multiple requests
-  const verifyButton =
+  const button =
     document.querySelector(
-      '#verification .primary'
+      "#verification .primary"
     );
 
-  if(verifyButton){
 
-    verifyButton.disabled =
+  if(button){
+
+    button.disabled =
       true;
 
-    verifyButton.textContent =
+    button.innerHTML =
       "Checking...";
 
   }
 
 
-  const callbackName =
-    "vivexCallback_" +
+  const callback =
+    "vivexVerify_" +
     Date.now();
 
 
-  window[callbackName] =
+  window[callback] =
     function(result){
 
-      try{
+      if(
+        result &&
+        result.success
+      ){
 
-        if(
-          result &&
-          result.success
-        ){
-
-          showResult();
-
-        }
-        else{
-
-          showErrorPopup(
-            result &&
-            result.message
-              ? result.message
-              : "Invalid verification code."
-          );
-
-        }
+        showResult();
 
       }
-      catch(error){
+      else{
 
         showErrorPopup(
-          "Verification failed. Please try again."
+          result?.message ||
+          "Invalid verification code."
         );
 
       }
 
 
-      if(verifyButton){
+      if(button){
 
-        verifyButton.disabled =
+        button.disabled =
           false;
 
-        verifyButton.innerHTML =
-          'Verify <b>✓</b>';
+        button.innerHTML =
+          "Verify <b>✓</b>";
 
       }
 
 
       try{
 
-        delete window[callbackName];
+        delete window[callback];
 
       }
       catch(e){}
@@ -614,15 +528,22 @@ function verifyCode(){
 
 
   const params =
-    new URLSearchParams({
+    new URLSearchParams();
 
-      code:code,
+  params.set(
+    "code",
+    code
+  );
 
-      device:deviceId,
+  params.set(
+    "device",
+    deviceId
+  );
 
-      callback:callbackName
-
-    });
+  params.set(
+    "callback",
+    callback
+  );
 
 
   script.src =
@@ -635,27 +556,19 @@ function verifyCode(){
     function(){
 
       showErrorPopup(
-        "Unable to connect to verification server. Please try again."
+        "Connection failed. Please try again."
       );
 
 
-      if(verifyButton){
+      if(button){
 
-        verifyButton.disabled =
+        button.disabled =
           false;
 
-        verifyButton.innerHTML =
-          'Verify <b>✓</b>';
+        button.innerHTML =
+          "Verify <b>✓</b>";
 
       }
-
-
-      try{
-
-        delete window[callbackName];
-
-      }
-      catch(e){}
 
     };
 
@@ -663,13 +576,10 @@ function verifyCode(){
   document.body.appendChild(script);
 
 
-  // Cleanup script after request
   setTimeout(() => {
 
     try{
-
       script.remove();
-
     }
     catch(e){}
 
@@ -678,121 +588,93 @@ function verifyCode(){
 }
 
 
-// ==========================================
-// ERROR POPUP
-// ==========================================
+// ================================
+// POPUP
+// ================================
 
 function showErrorPopup(message){
 
-  const popupMessage =
-    $("popupMessage");
+  if($("popupMessage")){
 
-  if(popupMessage){
-
-    popupMessage.textContent =
+    $("popupMessage").textContent =
       message;
 
   }
 
+  if($("customPopup")){
 
-  const popup =
-    $("customPopup");
-
-  if(popup){
-
-    popup.classList.add("show");
+    $("customPopup")
+      .classList
+      .add("show");
 
   }
 
 }
 
-
-// ==========================================
-// CLOSE ERROR POPUP
-// ==========================================
 
 function closeErrorPopup(){
 
-  const popup =
-    $("customPopup");
+  if($("customPopup")){
 
-  if(popup){
-
-    popup.classList.remove("show");
+    $("customPopup")
+      .classList
+      .remove("show");
 
   }
 
 }
 
 
-// ==========================================
-// CALCULATE DEVICE FACTOR
-// ==========================================
+// ================================
+// DEVICE FACTOR
+// ================================
 
 function calculateDeviceFactor(){
 
   let factor = 0;
 
 
-  // Resolution effect
-  if(
-    state.screenWidth &&
-    state.screenHeight
-  ){
-
-    const pixels =
-      state.screenWidth *
-      state.screenHeight;
+  const pixels =
+    state.screenWidth *
+    state.screenHeight;
 
 
-    if(pixels >= 2500000){
-      factor += 4;
-    }
-    else if(pixels >= 2000000){
-      factor += 3;
-    }
-    else if(pixels >= 1500000){
-      factor += 2;
-    }
-    else if(pixels >= 1000000){
-      factor += 1;
-    }
-
+  if(pixels >= 2500000){
+    factor += 4;
+  }
+  else if(pixels >= 2000000){
+    factor += 3;
+  }
+  else if(pixels >= 1500000){
+    factor += 2;
+  }
+  else if(pixels >= 1000000){
+    factor += 1;
   }
 
 
-  // PPI effect
-  if(state.density){
-
-    if(state.density >= 500){
-      factor += 4;
-    }
-    else if(state.density >= 420){
-      factor += 3;
-    }
-    else if(state.density >= 360){
-      factor += 2;
-    }
-    else if(state.density >= 300){
-      factor += 1;
-    }
-
+  if(state.density >= 500){
+    factor += 4;
+  }
+  else if(state.density >= 420){
+    factor += 3;
+  }
+  else if(state.density >= 360){
+    factor += 2;
+  }
+  else if(state.density >= 300){
+    factor += 1;
   }
 
 
-  // DPR effect
-  if(state.dpr){
-
-    if(state.dpr >= 4){
-      factor += 3;
-    }
-    else if(state.dpr >= 3){
-      factor += 2;
-    }
-    else if(state.dpr >= 2){
-      factor += 1;
-    }
-
+  if(state.dpr >= 4){
+    factor += 3;
+  }
+  else if(state.dpr >= 3){
+    factor += 2;
+  }
+  else if(state.dpr >= 2){
+    factor += 1;
   }
 
 
@@ -804,138 +686,9 @@ function calculateDeviceFactor(){
 }
 
 
-// ==========================================
-// CALCULATE SENSITIVITY
-// ==========================================
-
-function calculateSettings(){
-
-  const brandFactor =
-    BRAND_FACTOR[state.brand] || 0;
-
-
-  const ramEffect =
-    RAM_FACTOR[state.ram] || 0;
-
-
-  const storageEffect =
-    STORAGE_FACTOR[state.storage] || 0;
-
-
-  const deviceFactor =
-    calculateDeviceFactor();
-
-
-  const totalFactor =
-    brandFactor +
-    ramEffect +
-    storageEffect +
-    deviceFactor;
-
-
-  // Base sensitivity
-  const base =
-    145 +
-    totalFactor;
-
-
-  const general =
-    clamp(
-      base + 15,
-      100,
-      200
-    );
-
-
-  const redDot =
-    clamp(
-      base + 8,
-      90,
-      195
-    );
-
-
-  const twoX =
-    clamp(
-      base,
-      80,
-      190
-    );
-
-
-  const fourX =
-    clamp(
-      base - 12,
-      70,
-      180
-    );
-
-
-  const sniper =
-    clamp(
-      base - 45,
-      40,
-      140
-    );
-
-
-  const freeLook =
-    clamp(
-      base + 4,
-      90,
-      195
-    );
-
-
-  const fireButton =
-    clamp(
-      48 +
-      Math.round(
-        totalFactor / 2
-      ),
-      45,
-      55
-    );
-
-
-  // DPI recommendation
-  const dpi =
-    clamp(
-      Math.round(
-        380 +
-        (
-          state.density - 320
-        ) * 1.2 +
-        deviceFactor * 5 +
-        ramEffect * 3 +
-        storageEffect * 2
-      ),
-      320,
-      560
-    );
-
-
-  return {
-
-    general,
-    redDot,
-    twoX,
-    fourX,
-    sniper,
-    freeLook,
-
-    fireButton,
-
-    dpi
-
-  };
-
-}
-
-
-// ==========================================
+// ================================
 // CLAMP
-// ==========================================
+// ================================
 
 function clamp(
   value,
@@ -954,53 +707,135 @@ function clamp(
 }
 
 
-// ==========================================
+// ================================
+// CALCULATE SETTINGS
+// ================================
+
+function calculateSettings(){
+
+  const brand =
+    BRAND_FACTOR[state.brand] || 0;
+
+  const ram =
+    RAM_FACTOR[state.ram] || 0;
+
+  const storage =
+    STORAGE_FACTOR[state.storage] || 0;
+
+  const device =
+    calculateDeviceFactor();
+
+  const total =
+    brand +
+    ram +
+    storage +
+    device;
+
+
+  const base =
+    145 + total;
+
+
+  return {
+
+    general:
+      clamp(
+        base + 15,
+        100,
+        200
+      ),
+
+    redDot:
+      clamp(
+        base + 8,
+        90,
+        195
+      ),
+
+    twoX:
+      clamp(
+        base,
+        80,
+        190
+      ),
+
+    fourX:
+      clamp(
+        base - 12,
+        70,
+        180
+      ),
+
+    sniper:
+      clamp(
+        base - 45,
+        40,
+        140
+      ),
+
+    freeLook:
+      clamp(
+        base + 4,
+        90,
+        195
+      ),
+
+    fireButton:
+      clamp(
+        48 +
+        Math.round(total / 2),
+        45,
+        55
+      ),
+
+    dpi:
+      clamp(
+        Math.round(
+          380 +
+          (state.density - 320) * 1.2 +
+          device * 5 +
+          ram * 3 +
+          storage * 2
+        ),
+        320,
+        560
+      )
+
+  };
+
+}
+
+
+// ================================
 // SHOW RESULT
-// ==========================================
+// ================================
 
 function showResult(){
 
-  const settings =
+  const s =
     calculateSettings();
 
 
-  // Brand
-  if($("resultBrand")){
-
+  if($("resultBrand"))
     $("resultBrand").textContent =
       state.brand;
 
-  }
 
-
-  // RAM
-  if($("resultRam")){
-
+  if($("resultRam"))
     $("resultRam").textContent =
       state.ram;
 
-  }
 
-
-  // Storage
-  if($("resultStorage")){
-
+  if($("resultStorage"))
     $("resultStorage").textContent =
       state.storage;
 
-  }
 
-
-  // Density
-  if($("resultDensity")){
-
+  if($("resultDensity"))
     $("resultDensity").textContent =
       `~${state.density} PPI`;
 
-  }
 
-
-  // Settings grid
   const grid =
     $("settingsGrid");
 
@@ -1010,42 +845,19 @@ function showResult(){
     grid.innerHTML = "";
 
 
-    const settingsList = [
+    const list = [
 
-      [
-        "GENERAL",
-        settings.general
-      ],
-
-      [
-        "RED DOT",
-        settings.redDot
-      ],
-
-      [
-        "2X SCOPE",
-        settings.twoX
-      ],
-
-      [
-        "4X SCOPE",
-        settings.fourX
-      ],
-
-      [
-        "SNIPER",
-        settings.sniper
-      ],
-
-      [
-        "FREE LOOK",
-        settings.freeLook
-      ]
+      ["GENERAL",s.general],
+      ["RED DOT",s.redDot],
+      ["2X SCOPE",s.twoX],
+      ["4X SCOPE",s.fourX],
+      ["SNIPER",s.sniper],
+      ["FREE LOOK",s.freeLook]
 
     ];
 
 
-    settingsList.forEach(
+    list.forEach(
       ([name,value]) => {
 
         const card =
@@ -1054,15 +866,10 @@ function showResult(){
         card.className =
           "setting-card";
 
-
         card.innerHTML = `
-
           <small>${name}</small>
-
           <strong>${value}</strong>
-
         `;
-
 
         grid.appendChild(card);
 
@@ -1072,22 +879,14 @@ function showResult(){
   }
 
 
-  // Fire button
-  if($("fireButton")){
-
+  if($("fireButton"))
     $("fireButton").textContent =
-      `${settings.fireButton}%`;
-
-  }
+      `${s.fireButton}%`;
 
 
-  // DPI
-  if($("dpi")){
-
+  if($("dpi"))
     $("dpi").textContent =
-      settings.dpi;
-
-  }
+      s.dpi;
 
 
   goTo("result");
@@ -1095,9 +894,9 @@ function showResult(){
 }
 
 
-// ==========================================
+// ================================
 // RESTART
-// ==========================================
+// ================================
 
 function restart(){
 
@@ -1109,11 +908,9 @@ function restart(){
 
   state.screenWidth = 0;
   state.screenHeight = 0;
-
   state.dpr = 1;
 
 
-  // Reset brand selection
   document
     .querySelectorAll(".brand-card")
     .forEach(card => {
@@ -1125,40 +922,21 @@ function restart(){
     });
 
 
-  // Reset RAM
-  if($("ramSelect")){
-
-    $("ramSelect").value =
-      "";
-
-  }
+  if($("ramSelect"))
+    $("ramSelect").value = "";
 
 
-  // Reset Storage
-  if($("storageSelect")){
-
-    $("storageSelect").value =
-      "";
-
-  }
+  if($("storageSelect"))
+    $("storageSelect").value = "";
 
 
-  // Reset density
-  if($("densityText")){
-
+  if($("densityText"))
     $("densityText").textContent =
       "Not scanned yet";
 
-  }
 
-
-  // Reset verification input
-  if($("verificationCode")){
-
-    $("verificationCode").value =
-      "";
-
-  }
+  if($("verificationCode"))
+    $("verificationCode").value = "";
 
 
   updateNext();
@@ -1168,13 +946,13 @@ function restart(){
 }
 
 
-// ==========================================
-// CLOSE POPUP WHEN CLICKING OUTSIDE
-// ==========================================
+// ================================
+// POPUP OUTSIDE CLICK
+// ================================
 
 document.addEventListener(
   "click",
-  function(event){
+  event => {
 
     const popup =
       $("customPopup");
@@ -1192,9 +970,9 @@ document.addEventListener(
 );
 
 
-// ==========================================
-// START APP
-// ==========================================
+// ================================
+// START
+// ================================
 
 if(
   document.readyState ===
