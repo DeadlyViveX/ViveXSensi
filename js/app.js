@@ -13,7 +13,7 @@ const VERIFY_API =
 
 
 /* =========================================
-   BASIC HELPERS
+   BASIC HELPER
 ========================================= */
 
 function $(id){
@@ -300,21 +300,17 @@ function init(){
       button.className =
         "brand-btn";
 
-
       button.type =
         "button";
 
-
       button.textContent =
         brand;
-
 
       button.onclick =
         () => selectBrand(
           brand,
           button
         );
-
 
       brandGrid.appendChild(
         button
@@ -596,12 +592,6 @@ function verifyCodeWithServer(
   code,
   deviceId
 ){
-
-  /*
-   * JSONP is used because the
-   * website is hosted separately
-   * from Google Apps Script.
-   */
 
   const callbackName =
     "vivexCallback_" +
@@ -940,9 +930,9 @@ function calculateSettings(){
     ] || 0;
 
 
-  /*
-   * Resolution factor
-   */
+  /* =====================================
+     RESOLUTION FACTOR
+  ===================================== */
 
   const resolution =
     state.screenWidth *
@@ -991,9 +981,9 @@ function calculateSettings(){
   }
 
 
-  /*
-   * PPI factor
-   */
+  /* =====================================
+     PPI FACTOR
+  ===================================== */
 
   let ppiFactor =
     0;
@@ -1037,9 +1027,9 @@ function calculateSettings(){
   }
 
 
-  /*
-   * DPR factor
-   */
+  /* =====================================
+     DPR FACTOR
+  ===================================== */
 
   let dprFactor =
     Math.round(
@@ -1057,9 +1047,9 @@ function calculateSettings(){
     );
 
 
-  /*
-   * Total device factor
-   */
+  /* =====================================
+     TOTAL FACTOR
+  ===================================== */
 
   const totalFactor =
     resolutionFactor +
@@ -1070,9 +1060,9 @@ function calculateSettings(){
     storageEffect;
 
 
-  /*
-   * Base sensitivity
-   */
+  /* =====================================
+     BASE SENSITIVITY
+  ===================================== */
 
   const base =
     145 +
@@ -1138,9 +1128,9 @@ function calculateSettings(){
   };
 
 
-  /*
-   * Fire button
-   */
+  /* =====================================
+     FIRE BUTTON
+  ===================================== */
 
   const fireButton =
     clamp(
@@ -1153,30 +1143,59 @@ function calculateSettings(){
     );
 
 
+  /* =====================================
+     RECOMMENDED DPI
+     MINIMUM 400
+     MAXIMUM 600
+  ===================================== */
+
   /*
-   * Recommended DPI
+   * Smooth PPI-based DPI.
+   *
+   * 273 PPI ≈ 400+
+   * 300 PPI ≈ 420+
+   * 350 PPI ≈ 460+
+   * 373 PPI ≈ 480+
+   * 400 PPI ≈ 500+
+   *
+   * RAM / storage / brand only
+   * make small adjustments.
    */
 
   let dpi =
-    380 +
+    400 +
     (
       state.density -
-      320
-    ) * 1.2 +
-    (
-      resolutionFactor +
-      ppiFactor +
-      dprFactor
-    ) * 5 +
-    ramEffect * 3 +
-    storageEffect * 2;
+      273
+    ) * 1.8;
 
+
+  /*
+   * Small device adjustments
+   */
+
+  dpi +=
+    brandEffect * 2;
+
+
+  dpi +=
+    ramEffect * 1.5;
+
+
+  dpi +=
+    storageEffect * 1;
+
+
+  /*
+   * Keep recommended DPI
+   * between 400 and 600.
+   */
 
   dpi =
     clamp(
       Math.round(dpi),
-      320,
-      560
+      400,
+      600
     );
 
 
@@ -1222,10 +1241,6 @@ function showResult(){
     calculateSettings();
 
 
-  /*
-   * Brand
-   */
-
   if($("resultBrand")){
 
     $("resultBrand")
@@ -1234,10 +1249,6 @@ function showResult(){
 
   }
 
-
-  /*
-   * RAM
-   */
 
   if($("resultRam")){
 
@@ -1248,10 +1259,6 @@ function showResult(){
   }
 
 
-  /*
-   * Storage
-   */
-
   if($("resultStorage")){
 
     $("resultStorage")
@@ -1260,10 +1267,6 @@ function showResult(){
 
   }
 
-
-  /*
-   * Density
-   */
 
   if($("resultDensity")){
 
@@ -1275,10 +1278,6 @@ function showResult(){
 
   }
 
-
-  /*
-   * Settings
-   */
 
   const settingsGrid =
     $("settingsGrid");
@@ -1335,10 +1334,6 @@ function showResult(){
   }
 
 
-  /*
-   * Fire Button
-   */
-
   if($("fireButton")){
 
     $("fireButton")
@@ -1348,10 +1343,6 @@ function showResult(){
 
   }
 
-
-  /*
-   * DPI
-   */
 
   if($("dpi")){
 
@@ -1387,10 +1378,6 @@ function restart(){
   state.dpr = 1;
 
 
-  /*
-   * Reset brand buttons
-   */
-
   document
     .querySelectorAll(
       ".brand-btn"
@@ -1404,10 +1391,6 @@ function restart(){
     });
 
 
-  /*
-   * Reset RAM
-   */
-
   if($("ramSelect")){
 
     $("ramSelect")
@@ -1415,10 +1398,6 @@ function restart(){
 
   }
 
-
-  /*
-   * Reset storage
-   */
 
   if($("storageSelect")){
 
@@ -1428,10 +1407,6 @@ function restart(){
   }
 
 
-  /*
-   * Reset density
-   */
-
   if($("densityText")){
 
     $("densityText")
@@ -1440,10 +1415,6 @@ function restart(){
 
   }
 
-
-  /*
-   * Reset verification input
-   */
 
   if($("verificationCode")){
 
@@ -1507,16 +1478,7 @@ document.addEventListener(
   "DOMContentLoaded",
   () => {
 
-    /*
-     * Create device ID immediately.
-     */
-
     getDeviceId();
-
-
-    /*
-     * Initialize app.
-     */
 
     init();
 
