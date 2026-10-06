@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
@@ -631,8 +632,6 @@
 
 
 
-      <!-- CONTINUE -->
-
       <button
         class="primary payment-submit-btn"
         onclick="openConfirmation()"
@@ -855,6 +854,46 @@
 
 
   </main>
+
+
+
+  <!-- ================================
+       CUSTOM ERROR POPUP
+  ================================= -->
+
+  <div
+    class="custom-popup"
+    id="customPopup"
+  >
+
+    <div class="custom-popup-card">
+
+
+      <div class="custom-popup-icon">
+        !
+      </div>
+
+
+      <h3>
+        Invalid Code
+      </h3>
+
+
+      <p id="popupMessage">
+        Invalid verification code.
+      </p>
+
+
+      <button
+        onclick="closeErrorPopup()"
+      >
+        OK
+      </button>
+
+
+    </div>
+
+  </div>
 
 
 
