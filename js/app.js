@@ -409,10 +409,11 @@ function scanDensity(){
 
 
   /*
-   * Browser cannot reliably read
-   * actual Android system DPI.
+   * Browser cannot directly read
+   * the actual Android system DPI.
    *
-   * This is an estimated PPI.
+   * This remains an estimated PPI
+   * based on browser device density.
    */
 
   const ppi =
@@ -1145,38 +1146,46 @@ function calculateSettings(){
 
   /* =====================================
      RECOMMENDED DPI
-     FIXED PPI RELATIONSHIP
+     FIXED INVERSE PPI LOGIC
   ===================================== */
 
   /*
    * IMPORTANT:
    *
-   * Browser cannot read the real Android
-   * system DPI reliably.
+   * Browser PPI is an estimate.
+   * Android system DPI cannot be reliably
+   * read from a normal web browser.
    *
-   * The value below is therefore a
-   * RECOMMENDED GAMING DPI, not a claim
-   * that this is the phone's actual DPI.
+   * The recommendation therefore uses
+   * a consistent inverse relationship:
    *
-   * Higher estimated PPI = lower
-   * recommended gaming DPI.
+   * LOWER PPI  = HIGHER DPI
+   * HIGHER PPI = LOWER DPI
    *
-   * Approximate anchors:
+   * Approximate reference:
    *
-   * 273 PPI -> 500 DPI
-   * 320 PPI -> 465 DPI
-   * 350 PPI -> 442 DPI
-   * 373 PPI -> 425 DPI
-   * 400 PPI -> 405 DPI
+   * 250 PPI -> ~517 DPI
+   * 273 PPI -> ~500 DPI
+   * 300 PPI -> ~480 DPI
+   * 350 PPI -> ~443 DPI
+   * 373 PPI -> ~426 DPI
+   * 400 PPI -> ~406 DPI
    *
-   * RAM / storage / brand adjustments
-   * are intentionally kept very small so
-   * they cannot overpower the PPI effect.
+   * RAM/storage/brand only make tiny
+   * adjustments so they cannot reverse
+   * the main PPI relationship.
    */
+
 
   const ppi =
     state.density || 320;
 
+
+  /*
+   * Main inverse PPI curve.
+   *
+   * 273 PPI is the anchor at 500 DPI.
+   */
 
   let dpi =
     500 -
@@ -1187,12 +1196,13 @@ function calculateSettings(){
 
 
   /*
-   * Small device adjustments.
-   * These do NOT reverse the PPI relationship.
+   * Very small device adjustment.
+   *
+   * These are intentionally kept small.
    */
 
   dpi +=
-    brandEffect * 1;
+    brandEffect * 0.8;
 
 
   dpi +=
@@ -1204,16 +1214,17 @@ function calculateSettings(){
 
 
   /*
-   * Recommended gaming DPI:
-   * minimum 400
-   * maximum 550
+   * Final recommendation range.
+   *
+   * Minimum 400 DPI
+   * Maximum 520 DPI
    */
 
   dpi =
     clamp(
       Math.round(dpi),
       400,
-      550
+      520
     );
 
 
@@ -1313,192 +1324,4 @@ function showResult(){
       </div>
 
       <div class="setting-card">
-        <small>RED DOT</small>
-        <strong>
-          ${result.settings.redDot}
-        </strong>
-      </div>
-
-      <div class="setting-card">
-        <small>2X SCOPE</small>
-        <strong>
-          ${result.settings.twoX}
-        </strong>
-      </div>
-
-      <div class="setting-card">
-        <small>4X SCOPE</small>
-        <strong>
-          ${result.settings.fourX}
-        </strong>
-      </div>
-
-      <div class="setting-card">
-        <small>SNIPER</small>
-        <strong>
-          ${result.settings.sniper}
-        </strong>
-      </div>
-
-      <div class="setting-card">
-        <small>FREE LOOK</small>
-        <strong>
-          ${result.settings.freeLook}
-        </strong>
-      </div>
-
-    `;
-
-  }
-
-
-  if($("fireButton")){
-
-    $("fireButton")
-      .textContent =
-      result.fireButton +
-      "%";
-
-  }
-
-
-  if($("dpi")){
-
-    $("dpi")
-      .textContent =
-      result.dpi;
-
-  }
-
-
-  goTo(
-    "result"
-  );
-
-}
-
-
-/* =========================================
-   RESTART
-========================================= */
-
-function restart(){
-
-  state.brand = "";
-  state.ram = "";
-  state.storage = "";
-
-  state.density = 0;
-
-  state.screenWidth = 0;
-  state.screenHeight = 0;
-
-  state.dpr = 1;
-
-
-  document
-    .querySelectorAll(
-      ".brand-btn"
-    )
-    .forEach(btn => {
-
-      btn.classList.remove(
-        "selected"
-      );
-
-    });
-
-
-  if($("ramSelect")){
-
-    $("ramSelect")
-      .value = "";
-
-  }
-
-
-  if($("storageSelect")){
-
-    $("storageSelect")
-      .value = "";
-
-  }
-
-
-  if($("densityText")){
-
-    $("densityText")
-      .textContent =
-      "Not scanned yet";
-
-  }
-
-
-  if($("verificationCode")){
-
-    $("verificationCode")
-      .value = "";
-
-  }
-
-
-  updateNext();
-
-
-  goTo(
-    "home"
-  );
-
-}
-
-
-/* =========================================
-   ENTER KEY FOR VERIFICATION
-========================================= */
-
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
-
-    const input =
-      $("verificationCode");
-
-
-    if(input){
-
-      input.addEventListener(
-        "keydown",
-        event => {
-
-          if(
-            event.key ===
-            "Enter"
-          ){
-
-            verifyCode();
-
-          }
-
-        }
-      );
-
-    }
-
-  }
-);
-
-
-/* =========================================
-   START APP
-========================================= */
-
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
-
-    getDeviceId();
-
-    init();
-
-  }
-);
+        <
