@@ -1,6 +1,6 @@
 /* =========================================
    VIVEX SENSI
-   COMPLETE STYLE SHEET
+   COMPLETE CSS
 ========================================= */
 
 :root{
@@ -33,11 +33,8 @@ body{
   min-height:100vh;
   background:var(--bg);
   color:#fff;
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-  overflow-x:hidden;
+  font-family:Arial,Helvetica,sans-serif;
+  overflow:hidden;
 }
 
 button,
@@ -62,7 +59,7 @@ a{
 
 .app{
   width:100%;
-  min-height:100vh;
+  height:100svh;
   position:relative;
   overflow:hidden;
 }
@@ -71,7 +68,8 @@ a{
   display:none;
   width:100%;
   max-width:720px;
-  min-height:100vh;
+  height:100svh;
+  min-height:100svh;
   margin:0 auto;
   padding:28px 26px 35px;
   position:relative;
@@ -382,8 +380,7 @@ a{
   position:relative;
   z-index:2;
   display:grid;
-  grid-template-columns:
-    repeat(3,1fr);
+  grid-template-columns:repeat(3,1fr);
   gap:10px;
   margin-top:25px;
 }
@@ -540,20 +537,32 @@ a{
   line-height:1.4;
 }
 
+
+/* =========================================
+   WHITE SCAN BUTTON
+========================================= */
+
 .scan-btn{
   flex:none;
   padding:11px 16px;
   border-radius:11px;
-  border:1px solid #3b3b3b;
-  background:#191919;
-  color:#fff;
+  border:1px solid #fff;
+  background:#fff;
+  color:#111;
   font-size:13px;
   font-weight:900;
   cursor:pointer;
+  transition:.15s;
 }
 
 .scan-btn:hover{
-  border-color:var(--red);
+  background:#f1f1f1;
+  color:#000;
+  border-color:#fff;
+}
+
+.scan-btn:active{
+  transform:scale(.96);
 }
 
 
@@ -727,6 +736,22 @@ a{
 
 
 /* =========================================
+   PAYMENT PAGE SCROLL
+========================================= */
+
+#payment{
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:none;
+}
+
+#payment::-webkit-scrollbar{
+  width:0;
+  display:none;
+}
+
+
+/* =========================================
    CONFIRMATION
 ========================================= */
 
@@ -825,8 +850,7 @@ a{
   position:relative;
   z-index:2;
   display:grid;
-  grid-template-columns:
-    repeat(2,1fr);
+  grid-template-columns:repeat(2,1fr);
   gap:12px;
   margin-top:18px;
 }
@@ -873,8 +897,7 @@ a{
   position:relative;
   z-index:2;
   display:grid;
-  grid-template-columns:
-    repeat(2,1fr);
+  grid-template-columns:repeat(2,1fr);
   gap:12px;
   margin-top:14px;
 }
@@ -918,7 +941,7 @@ a{
 
 
 /* =========================================
-   CUSTOM ERROR POPUP
+   CUSTOM POPUP
 ========================================= */
 
 .custom-popup{
@@ -958,8 +981,7 @@ a{
   transition:.2s;
 }
 
-.custom-popup.show
-.custom-popup-card{
+.custom-popup.show .custom-popup-card{
   transform:scale(1);
 }
 
@@ -1091,8 +1113,7 @@ a{
   }
 
   .brand-grid{
-    grid-template-columns:
-      repeat(3,1fr);
+    grid-template-columns:repeat(3,1fr);
     gap:8px;
   }
 
@@ -1109,8 +1130,7 @@ a{
   }
 
   .settings-grid{
-    grid-template-columns:
-      repeat(2,1fr);
+    grid-template-columns:repeat(2,1fr);
     gap:10px;
   }
 
@@ -1278,10 +1298,10 @@ a:focus-visible{
 
 
 /* =========================================
-   RED SELECTION
+   TEXT SELECTION
 ========================================= */
 
 ::selection{
   background:var(--red);
   color:#fff;
-}
+       }
