@@ -21,7 +21,6 @@ const IS_MOBILE =
   isMobileDevice();
 
 
-
 if(!IS_MOBILE){
 
   document.addEventListener(
@@ -90,6 +89,7 @@ const BRANDS = [
   "Vivo",
   "OPPO",
   "Xiaomi",
+  "Redmi",
   "OnePlus",
   "Motorola",
   "Infinix",
@@ -119,6 +119,8 @@ const BRAND_FACTOR = {
   "OPPO":1,
 
   "Xiaomi":3,
+
+  "Redmi":3,
 
   "OnePlus":4,
 
@@ -167,7 +169,9 @@ function goTo(id){
 
 
   if(!target){
+
     return;
+
   }
 
 
@@ -198,7 +202,9 @@ function init(){
 
 
   if(!brandGrid){
+
     return;
+
   }
 
 
@@ -391,7 +397,7 @@ function updateNext(){
 
 
 /* =================================
-   OPEN VERIFICATION
+   VERIFICATION FLOW
 ================================= */
 
 function openVerification(){
@@ -404,7 +410,7 @@ function openVerification(){
 
 
 /* =================================
-   OPEN PAYMENT
+   PAYMENT PAGE
 ================================= */
 
 function openPayment(){
@@ -430,7 +436,7 @@ function openConfirmation(){
 
 
 /* =================================
-   TEMPORARY VERIFICATION
+   VERIFY CODE
 ================================= */
 
 function verifyCode(){
@@ -444,13 +450,9 @@ function verifyCode(){
   /*
     TEMPORARY TEST CODE
 
-    IMPORTANT:
-
-    Ye sirf testing ke liye hai.
-
-    Baad me Google Sheet /
-    Apps Script verification
-    se replace karenge.
+    Real payment verification
+    baad me Google Sheet /
+    Apps Script se connect hoga.
   */
 
 
@@ -468,11 +470,42 @@ function verifyCode(){
 
   else{
 
-    alert(
+    showErrorPopup(
       "Invalid verification code."
     );
 
   }
+
+}
+
+
+/* =================================
+   CUSTOM ERROR POPUP
+================================= */
+
+function showErrorPopup(
+  message
+){
+
+  $("popupMessage")
+    .textContent =
+    message;
+
+
+  $("customPopup")
+    .classList.add(
+      "show"
+    );
+
+}
+
+
+function closeErrorPopup(){
+
+  $("customPopup")
+    .classList.remove(
+      "show"
+    );
 
 }
 
@@ -539,7 +572,9 @@ function getStorage(){
    RAM EFFECT
 ================================= */
 
-function getRamEffect(ram){
+function getRamEffect(
+  ram
+){
 
   if(ram <= 4){
 
@@ -1059,7 +1094,9 @@ function showResult(){
     recommendedDpi;
 
 
-  goTo("result");
+  goTo(
+    "result"
+  );
 
 }
 
@@ -1114,7 +1151,12 @@ function restart(){
     "";
 
 
-  goTo("home");
+  closeErrorPopup();
+
+
+  goTo(
+    "home"
+  );
 
 }
 
