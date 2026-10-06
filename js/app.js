@@ -78,11 +78,11 @@ function getDeviceId(){
 
     if(
       window.crypto &&
-      window.crypto.randomUUID
+      crypto.randomUUID
     ){
 
       deviceId =
-        window.crypto.randomUUID();
+        crypto.randomUUID();
 
     }
     else{
@@ -306,18 +306,11 @@ function init(){
       button.textContent =
         brand;
 
-      button.addEventListener(
-        "click",
-        () => {
-
-          selectBrand(
-            brand,
-            button
-          );
-
-        }
-      );
-
+      button.onclick =
+        () => selectBrand(
+          brand,
+          button
+        );
 
       brandGrid.appendChild(
         button
@@ -383,16 +376,9 @@ function openDeviceStep(){
   }
 
 
-  const selectedBrand =
-    $("selectedBrand");
-
-
-  if(selectedBrand){
-
-    selectedBrand.textContent =
-      state.brand;
-
-  }
+  $("selectedBrand")
+    .textContent =
+    state.brand;
 
 
   goTo("device");
@@ -451,13 +437,10 @@ function scanDensity(){
     dpr;
 
 
-  const densityText =
-    $("densityText");
+  if($("densityText")){
 
-
-  if(densityText){
-
-    densityText.textContent =
+    $("densityText")
+      .textContent =
       `Detected • ${width} × ${height} • ${dpr.toFixed(2)}x • ~${ppi} PPI`;
 
   }
@@ -1162,40 +1145,33 @@ function calculateSettings(){
 
   /* =====================================
      RECOMMENDED DPI
-     400 - 550
-     INVERSE PPI RELATION
+     MINIMUM 400
+     MAXIMUM 600
   ===================================== */
 
-  const ppi =
-    state.density || 320;
-
-
   /*
-   * Lower PPI  = Higher DPI
-   * Higher PPI = Lower DPI
+   * Smooth PPI-based DPI.
    *
-   * Reference:
+   * 273 PPI ≈ 400+
+   * 300 PPI ≈ 420+
+   * 350 PPI ≈ 460+
+   * 373 PPI ≈ 480+
+   * 400 PPI ≈ 500+
    *
-   * 273 PPI -> around 500 DPI
-   * 300 PPI -> around 480 DPI
-   * 350 PPI -> around 442 DPI
-   * 373 PPI -> around 425 DPI
-   * 400 PPI -> around 405 DPI
+   * RAM / storage / brand only
+   * make small adjustments.
    */
 
   let dpi =
-    500 -
+    400 +
     (
-      ppi -
+      state.density -
       273
-    ) * 0.75;
+    ) * 1.8;
 
 
   /*
-   * Small device adjustments.
-   *
-   * These are deliberately small
-   * so PPI remains the main factor.
+   * Small device adjustments
    */
 
   dpi +=
@@ -1203,24 +1179,23 @@ function calculateSettings(){
 
 
   dpi +=
-    ramEffect * 1;
+    ramEffect * 1.5;
 
 
   dpi +=
-    storageEffect * 0.5;
+    storageEffect * 1;
 
 
   /*
-   * FINAL DPI RANGE:
-   * 400 minimum
-   * 550 maximum
+   * Keep recommended DPI
+   * between 400 and 600.
    */
 
   dpi =
     clamp(
       Math.round(dpi),
       400,
-      550
+      600
     );
 
 
@@ -1441,15 +1416,6 @@ function restart(){
   }
 
 
-  if($("selectedBrand")){
-
-    $("selectedBrand")
-      .textContent =
-      "Brand";
-
-  }
-
-
   if($("verificationCode")){
 
     $("verificationCode")
@@ -1466,59 +1432,6 @@ function restart(){
   );
 
 }
-
-
-/* =========================================
-   RAM SELECT
-========================================= */
-
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
-
-    const ramSelect =
-      $("ramSelect");
-
-
-    if(ramSelect){
-
-      ramSelect.addEventListener(
-        "change",
-        () => {
-
-          state.ram =
-            ramSelect.value;
-
-          updateNext();
-
-        }
-      );
-
-    }
-
-
-    const storageSelect =
-      $("storageSelect");
-
-
-    if(storageSelect){
-
-      storageSelect.addEventListener(
-        "change",
-        () => {
-
-          state.storage =
-            storageSelect.value;
-
-          updateNext();
-
-        }
-      );
-
-    }
-
-  }
-);
 
 
 /* =========================================
@@ -1543,8 +1456,6 @@ document.addEventListener(
             event.key ===
             "Enter"
           ){
-
-            event.preventDefault();
 
             verifyCode();
 
