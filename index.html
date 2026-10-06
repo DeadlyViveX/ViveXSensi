@@ -1,27 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
   <meta charset="UTF-8">
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
   >
 
   <meta
     name="theme-color"
-    content="#050505"
-  >
-
-  <meta
-    name="description"
-    content="ViveX Sensi - Free Fire sensitivity recommendations for your phone."
+    content="#080808"
   >
 
   <title>ViveX Sensi</title>
 
-  <!-- MAIN CSS -->
   <link
     rel="stylesheet"
     href="css/style.css"
@@ -32,14 +27,14 @@
 
 <body>
 
-
-  <!-- =========================================
+  <!-- =====================================
        DESKTOP BLOCK
-  ========================================== -->
+  ====================================== -->
 
   <div
     id="desktopBlock"
     class="desktop-block"
+    style="display:none;"
   >
 
     <div class="desktop-block-card">
@@ -65,16 +60,16 @@
   </div>
 
 
-  <!-- =========================================
+  <!-- =====================================
        APP
-  ========================================== -->
+  ====================================== -->
 
   <main class="app">
 
 
-    <!-- =======================================
+    <!-- ===================================
          HOME
-    ======================================== -->
+    ==================================== -->
 
     <section
       class="screen active"
@@ -108,6 +103,7 @@
 
 
       <button
+        type="button"
         class="primary"
         onclick="goTo('brand')"
       >
@@ -121,7 +117,6 @@
 
       <div class="social-buttons">
 
-
         <a
           class="social-btn youtube"
           href="https://youtube.com/@vivexhere?si=xS9GOxCW9NVXmO4i"
@@ -130,6 +125,7 @@
         >
 
           <span>▶</span>
+
           YouTube
 
         </a>
@@ -143,19 +139,20 @@
         >
 
           <span>◎</span>
+
           Instagram
 
         </a>
-
 
       </div>
 
     </section>
 
 
-    <!-- =======================================
+
+    <!-- ===================================
          BRAND
-    ======================================== -->
+    ==================================== -->
 
     <section
       class="screen"
@@ -165,6 +162,7 @@
       <div class="topbar">
 
         <button
+          type="button"
           class="back"
           onclick="goTo('home')"
         >
@@ -200,6 +198,7 @@
 
 
       <button
+        type="button"
         class="primary bottom-btn"
         id="brandNext"
         disabled
@@ -215,9 +214,10 @@
     </section>
 
 
-    <!-- =======================================
+
+    <!-- ===================================
          DEVICE
-    ======================================== -->
+    ==================================== -->
 
     <section
       class="screen"
@@ -227,6 +227,7 @@
       <div class="topbar">
 
         <button
+          type="button"
           class="back"
           onclick="goTo('brand')"
         >
@@ -255,8 +256,6 @@
       </p>
 
 
-      <!-- SELECTED BRAND -->
-
       <div class="selected-brand">
 
         <small>
@@ -270,10 +269,10 @@
       </div>
 
 
-      <!-- RAM + STORAGE -->
-
       <div class="ram-storage">
 
+
+        <!-- RAM -->
 
         <div class="field">
 
@@ -281,10 +280,7 @@
             RAM
           </label>
 
-          <select
-            id="ramSelect"
-            onchange="state.ram=this.value; updateNext()"
-          >
+          <select id="ramSelect">
 
             <option value="">
               Select RAM
@@ -319,16 +315,15 @@
         </div>
 
 
+        <!-- STORAGE -->
+
         <div class="field">
 
           <label>
             Storage
           </label>
 
-          <select
-            id="storageSelect"
-            onchange="state.storage=this.value; updateNext()"
-          >
+          <select id="storageSelect">
 
             <option value="">
               Select Storage
@@ -362,14 +357,12 @@
 
         </div>
 
-
       </div>
 
 
-      <!-- PIXEL DENSITY SCANNER -->
+      <!-- PIXEL DENSITY -->
 
       <div class="scan-card">
-
 
         <div class="scan-icon">
           ⌗
@@ -390,19 +383,20 @@
 
 
         <button
+          type="button"
           class="scan-btn"
           onclick="scanDensity()"
         >
-          Scan
-        </button>
 
+          Scan
+
+        </button>
 
       </div>
 
 
-      <!-- GET SENSI -->
-
       <button
+        type="button"
         class="primary bottom-btn"
         id="deviceNext"
         disabled
@@ -418,9 +412,10 @@
     </section>
 
 
-    <!-- =======================================
+
+    <!-- ===================================
          VERIFICATION
-    ======================================== -->
+    ==================================== -->
 
     <section
       class="screen"
@@ -430,6 +425,7 @@
       <div class="topbar">
 
         <button
+          type="button"
           class="back"
           onclick="goTo('device')"
         >
@@ -454,9 +450,10 @@
 
 
       <p class="hint">
-        Enter the verification code if you already
-        have it, or tap on the Get Verification Code
-        button.
+
+        Enter the verification code if you already have it,
+        or tap on the Get Verification Code button.
+
       </p>
 
 
@@ -474,6 +471,7 @@
 
 
       <button
+        type="button"
         class="primary"
         onclick="verifyCode()"
       >
@@ -486,6 +484,7 @@
 
 
       <button
+        type="button"
         class="secondary-btn"
         onclick="openPayment()"
       >
@@ -497,9 +496,10 @@
     </section>
 
 
-    <!-- =======================================
+
+    <!-- ===================================
          PAYMENT
-    ======================================== -->
+    ==================================== -->
 
     <section
       class="screen"
@@ -509,6 +509,7 @@
       <div class="topbar">
 
         <button
+          type="button"
           class="back"
           onclick="goTo('verification')"
         >
@@ -532,8 +533,6 @@
       </h2>
 
 
-      <!-- PRICE -->
-
       <div class="price-card">
 
         <small>
@@ -545,16 +544,16 @@
         </strong>
 
         <p>
+
           No refunds are available.
           Please pay exactly ₹29.
           We are not responsible for payments
           above or below ₹29.
+
         </p>
 
       </div>
 
-
-      <!-- QR -->
 
       <div class="qr-card">
 
@@ -565,8 +564,6 @@
 
       </div>
 
-
-      <!-- UPI -->
 
       <div class="upi-box">
 
@@ -581,8 +578,6 @@
       </div>
 
 
-      <!-- GOOGLE FORM -->
-
       <div class="form-card">
 
         <h3>
@@ -591,8 +586,10 @@
 
 
         <p>
+
           First make the ₹29 payment,
           then enter your Email and UTR number below.
+
         </p>
 
 
@@ -605,15 +602,16 @@
           marginwidth="0"
           title="ViveX Payment Form"
         >
+
           Loading…
+
         </iframe>
 
       </div>
 
 
-      <!-- PAYMENT SUBMITTED -->
-
       <button
+        type="button"
         class="primary payment-submit-btn"
         onclick="openConfirmation()"
       >
@@ -626,16 +624,19 @@
 
 
       <p class="form-note">
+
         After submitting the Google Form,
         tap the button above.
+
       </p>
 
     </section>
 
 
-    <!-- =======================================
+
+    <!-- ===================================
          CONFIRMATION
-    ======================================== -->
+    ==================================== -->
 
     <section
       class="screen"
@@ -645,6 +646,7 @@
       <div class="topbar">
 
         <button
+          type="button"
           class="back"
           onclick="goTo('payment')"
         >
@@ -659,7 +661,6 @@
 
 
       <div class="confirmation-card">
-
 
         <div class="confirmation-icon">
           ✓
@@ -686,11 +687,11 @@
 
         </p>
 
-
       </div>
 
 
       <button
+        type="button"
         class="primary bottom-btn"
         onclick="goTo('verification')"
       >
@@ -704,9 +705,10 @@
     </section>
 
 
-    <!-- =======================================
+
+    <!-- ===================================
          RESULT
-    ======================================== -->
+    ==================================== -->
 
     <section
       class="screen"
@@ -716,6 +718,7 @@
       <div class="topbar">
 
         <button
+          type="button"
           class="back"
           onclick="goTo('device')"
         >
@@ -738,8 +741,6 @@
         Your <span>best settings</span>
       </h2>
 
-
-      <!-- DEVICE CARD -->
 
       <div class="device-card">
 
@@ -770,18 +771,13 @@
       </div>
 
 
-      <!-- SETTINGS -->
-
       <div
         class="settings-grid"
         id="settingsGrid"
       ></div>
 
 
-      <!-- FIRE BUTTON + DPI -->
-
       <div class="recommend-row">
-
 
         <div>
 
@@ -808,13 +804,11 @@
 
         </div>
 
-
       </div>
 
 
-      <!-- RESTART -->
-
       <button
+        type="button"
         class="primary bottom-btn"
         onclick="restart()"
       >
@@ -833,13 +827,13 @@
 
     </section>
 
-
   </main>
 
 
-  <!-- =========================================
+
+  <!-- =====================================
        ERROR POPUP
-  ========================================== -->
+  ====================================== -->
 
   <div
     class="custom-popup"
@@ -847,7 +841,6 @@
   >
 
     <div class="custom-popup-card">
-
 
       <div class="custom-popup-icon">
         !
@@ -865,22 +858,26 @@
 
 
       <button
+        type="button"
         onclick="closeErrorPopup()"
       >
-        OK
-      </button>
 
+        OK
+
+      </button>
 
     </div>
 
   </div>
 
 
-  <!-- =========================================
-       MAIN JS
-  ========================================== -->
+
+  <!-- =====================================
+       MAIN JAVASCRIPT
+  ====================================== -->
 
   <script src="js/app.js"></script>
 
 </body>
+
 </html>
