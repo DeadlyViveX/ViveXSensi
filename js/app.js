@@ -1,12 +1,32 @@
-/* =========================================================
-   ViveX Sensi - app.js
-   ========================================================= */
+/* =========================================
+   VIVEX SENSI
+   MAIN APP SCRIPT
+========================================= */
 
-/* =========================
+
+/* =========================================
+   GOOGLE APPS SCRIPT URL
+========================================= */
+
+const VERIFY_API =
+  "https://script.google.com/macros/s/AKfycbxejo41XCZAECqxPviHVpiZnLdcLAEmVxEQ4utRRP47NAlol24sWuCbJjxeCVXMcOT3ng/exec";
+
+
+/* =========================================
+   BASIC HELPER
+========================================= */
+
+function $(id){
+  return document.getElementById(id);
+}
+
+
+/* =========================================
    MOBILE CHECK
-========================= */
+========================================= */
 
 function isMobileDevice(){
+
   const userAgent =
     navigator.userAgent ||
     navigator.vendor ||
@@ -17,54 +37,103 @@ function isMobileDevice(){
   );
 }
 
-const IS_MOBILE = isMobileDevice();
+const IS_MOBILE =
+  isMobileDevice();
+
 
 if(!IS_MOBILE){
+
   document.addEventListener(
     "DOMContentLoaded",
     () => {
+
       const block =
-        document.getElementById("desktopBlock");
+        $("desktopBlock");
 
       if(block){
         block.style.display = "flex";
       }
 
-      document.body.style.overflow = "hidden";
+      document.body.style.overflow =
+        "hidden";
+
     }
   );
+
 }
 
 
-/* =========================
-   HELPER
-========================= */
+/* =========================================
+   DEVICE ID
+========================================= */
 
-function $(id){
-  return document.getElementById(id);
+function getDeviceId(){
+
+  let deviceId =
+    localStorage.getItem(
+      "vivex_device_id"
+    );
+
+  if(!deviceId){
+
+    if(
+      window.crypto &&
+      crypto.randomUUID
+    ){
+
+      deviceId =
+        crypto.randomUUID();
+
+    }
+    else{
+
+      deviceId =
+        "VX-" +
+        Date.now().toString(36) +
+        "-" +
+        Math.random()
+          .toString(36)
+          .substring(2,12);
+
+    }
+
+    localStorage.setItem(
+      "vivex_device_id",
+      deviceId
+    );
+
+  }
+
+  return deviceId;
 }
 
 
-/* =========================
-   STATE
-========================= */
+/* =========================================
+   APP STATE
+========================================= */
 
 const state = {
+
   brand:"",
   ram:"",
   storage:"",
+
   density:0,
+
   screenWidth:0,
   screenHeight:0,
+
   dpr:1
+
 };
 
 
-/* =========================
+/* =========================================
    BRANDS
-========================= */
+========================================= */
 
 const BRANDS = [
+
   "Samsung",
   "Realme",
   "Vivo",
@@ -81,347 +150,96 @@ const BRANDS = [
   "Nothing",
   "Honor",
   "Google Pixel"
+
 ];
 
 
-/* =========================
+/* =========================================
    BRAND FACTOR
-   Small influence only
-========================= */
+========================================= */
 
 const BRAND_FACTOR = {
+
   "Samsung":0,
   "Realme":2,
   "Vivo":2,
   "OPPO":1,
+
   "Xiaomi":3,
   "Redmi":3,
+
   "OnePlus":4,
+
   "Motorola":0,
+
   "Infinix":3,
   "Tecno":3,
+
   "iQOO":5,
+
   "Apple":-3,
+
   "POCO":4,
+
   "Nothing":1,
   "Honor":1,
+
   "Google Pixel":-2
+
 };
 
 
-/* =========================
-   RAM FACTOR
-   Lower RAM = slightly higher
-   Higher RAM = slightly lower
-========================= */
+/* =========================================
+   RAM EFFECT
+   LOWER RAM = HIGHER SENSI
+========================================= */
 
 function getRamEffect(ram){
 
-  const map = {
+  const values = {
+
     "4 GB":5,
     "6 GB":3,
     "8 GB":1,
+
     "12 GB":-1,
     "16 GB":-3,
     "24 GB":-5
+
   };
 
-  return map[ram] ?? 0;
+  return values[ram] || 0;
 }
 
 
-/* =========================
-   STORAGE FACTOR
-========================= */
+/* =========================================
+   STORAGE EFFECT
+   LOWER STORAGE = HIGHER SENSI
+========================================= */
 
 function getStorageEffect(storage){
 
-  const map = {
+  const values = {
+
     "32 GB":5,
     "64 GB":3,
     "128 GB":1,
+
     "256 GB":-1,
     "512 GB":-3,
     "1 TB":-5
+
   };
 
-  return map[storage] ?? 0;
+  return values[storage] || 0;
 }
 
 
-/* =========================
-   DEVICE FACTOR
-========================= */
-
-function getDeviceFactor(){
-
-  const width =
-    state.screenWidth || 0;
-
-  const height =
-    state.screenHeight || 0;
-
-  const ppi =
-    state.density || 320;
-
-  const dpr =
-    state.dpr || 1;
-
-  /*
-    Resolution factor:
-    Higher resolution gives a small
-    sensitivity adjustment.
-  */
-
-  const resolution =
-    width * height;
-
-  let resolutionFactor = 0;
-
-  if(resolution >= 3000000){
-    resolutionFactor = 4;
-  }
-  else if(resolution >= 2400000){
-    resolutionFactor = 3;
-  }
-  else if(resolution >= 1800000){
-    resolutionFactor = 2;
-  }
-  else if(resolution >= 1200000){
-    resolutionFactor = 1;
-  }
-
-
-  /*
-    PPI factor:
-    Small effect only.
-  */
-
-  let ppiFactor = 0;
-
-  if(ppi >= 420){
-    ppiFactor = 4;
-  }
-  else if(ppi >= 380){
-    ppiFactor = 3;
-  }
-  else if(ppi >= 340){
-    ppiFactor = 2;
-  }
-  else if(ppi >= 300){
-    ppiFactor = 1;
-  }
-
-
-  /*
-    DPR factor
-  */
-
-  let dprFactor = 0;
-
-  if(dpr >= 3){
-    dprFactor = 3;
-  }
-  else if(dpr >= 2.5){
-    dprFactor = 2;
-  }
-  else if(dpr >= 2){
-    dprFactor = 1;
-  }
-
-
-  return {
-    resolutionFactor,
-    ppiFactor,
-    dprFactor
-  };
-}
-
-
-/* =========================
-   INIT BRAND GRID
-========================= */
-
-function initBrands(){
-
-  const grid =
-    $("brandGrid");
-
-  if(!grid){
-    return;
-  }
-
-  grid.innerHTML = "";
-
-  BRANDS.forEach(
-    brand => {
-
-      const card =
-        document.createElement("button");
-
-      card.type = "button";
-      card.className = "brand-card";
-
-      card.innerHTML = `
-        <span class="brand-icon">
-          ${brand.charAt(0)}
-        </span>
-        <span>${brand}</span>
-      `;
-
-      card.onclick = () => {
-        selectBrand(brand, card);
-      };
-
-      grid.appendChild(card);
-    }
-  );
-}
-
-
-/* =========================
-   BRAND SELECT
-========================= */
-
-function selectBrand(
-  brand,
-  element
-){
-
-  state.brand = brand;
-
-  document
-    .querySelectorAll(".brand-card")
-    .forEach(card => {
-      card.classList.remove("selected");
-    });
-
-  if(element){
-    element.classList.add("selected");
-  }
-
-  updateNext();
-}
-
-
-/* =========================
-   OPEN DEVICE STEP
-========================= */
-
-function openDeviceStep(){
-
-  if(!state.brand){
-    return;
-  }
-
-  const selectedBrand =
-    $("selectedBrand");
-
-  if(selectedBrand){
-    selectedBrand.textContent =
-      state.brand;
-  }
-
-  goTo("device");
-}
-
-
-/* =========================
-   SCAN PIXEL DENSITY
-========================= */
-
-function scanDensity(){
-
-  /*
-    IMPORTANT:
-    Browser cannot directly read
-    Android's actual system DPI.
-
-    We estimate display density using
-    browser/device pixel ratio.
-
-    Therefore UI uses "~PPI"
-    instead of claiming exact PPI.
-  */
-
-  const dpr =
-    window.devicePixelRatio || 1;
-
-  const width =
-    Math.round(
-      window.screen.width * dpr
-    );
-
-  const height =
-    Math.round(
-      window.screen.height * dpr
-    );
-
-  /*
-    Browser-based estimated PPI.
-  */
-
-  const ppi =
-    Math.round(160 * dpr);
-
-  state.density = ppi;
-  state.screenWidth = width;
-  state.screenHeight = height;
-  state.dpr = dpr;
-
-  const densityText =
-    $("densityText");
-
-  if(densityText){
-
-    densityText.textContent =
-      `Detected • ${width} × ${height} • ` +
-      `${dpr.toFixed(2)}x • ~${ppi} PPI`;
-  }
-
-  updateNext();
-}
-
-
-/* =========================
-   NEXT BUTTON STATE
-========================= */
-
-function updateNext(){
-
-  const brandNext =
-    $("brandNext");
-
-  if(brandNext){
-
-    brandNext.disabled =
-      !state.brand;
-  }
-
-
-  const deviceNext =
-    $("deviceNext");
-
-  if(deviceNext){
-
-    deviceNext.disabled =
-      !(
-        state.brand &&
-        state.ram &&
-        state.storage &&
-        state.density
-      );
-  }
-}
-
-
-/* =========================
+/* =========================================
    NAVIGATION
-========================= */
+========================================= */
 
-function goTo(
-  screenId
-){
+function goTo(id){
 
   document
     .querySelectorAll(".screen")
@@ -430,170 +248,681 @@ function goTo(
       screen.classList.remove(
         "active"
       );
+
     });
 
+
   const target =
-    $(screenId);
+    $(id);
 
   if(target){
 
     target.classList.add(
       "active"
     );
+
   }
 
-  window.scrollTo(
-    0,
-    0
-  );
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
 }
 
 
-/* =========================
-   VERIFICATION
-========================= */
+/* =========================================
+   INITIALIZE
+========================================= */
+
+function init(){
+
+  const brandGrid =
+    $("brandGrid");
+
+  if(!brandGrid){
+    return;
+  }
+
+
+  brandGrid.innerHTML = "";
+
+
+  BRANDS.forEach(
+    brand => {
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+      button.className =
+        "brand-btn";
+
+      button.type =
+        "button";
+
+      button.textContent =
+        brand;
+
+      button.onclick =
+        () => selectBrand(
+          brand,
+          button
+        );
+
+      brandGrid.appendChild(
+        button
+      );
+
+    }
+  );
+
+
+  updateNext();
+
+}
+
+
+/* =========================================
+   BRAND SELECTION
+========================================= */
+
+function selectBrand(
+  brand,
+  button
+){
+
+  state.brand =
+    brand;
+
+
+  document
+    .querySelectorAll(
+      ".brand-btn"
+    )
+    .forEach(btn => {
+
+      btn.classList.remove(
+        "selected"
+      );
+
+    });
+
+
+  if(button){
+
+    button.classList.add(
+      "selected"
+    );
+
+  }
+
+
+  updateNext();
+
+}
+
+
+/* =========================================
+   OPEN DEVICE PAGE
+========================================= */
+
+function openDeviceStep(){
+
+  if(!state.brand){
+    return;
+  }
+
+
+  $("selectedBrand")
+    .textContent =
+    state.brand;
+
+
+  goTo("device");
+
+}
+
+
+/* =========================================
+   SCAN PIXEL DENSITY
+========================================= */
+
+function scanDensity(){
+
+  const dpr =
+    window.devicePixelRatio || 1;
+
+
+  const width =
+    Math.round(
+      window.screen.width * dpr
+    );
+
+
+  const height =
+    Math.round(
+      window.screen.height * dpr
+    );
+
+
+  /*
+   * Browser cannot reliably read
+   * actual Android system DPI.
+   *
+   * This is an estimated PPI.
+   */
+
+  const ppi =
+    Math.round(
+      160 * dpr
+    );
+
+
+  state.density =
+    ppi;
+
+
+  state.screenWidth =
+    width;
+
+
+  state.screenHeight =
+    height;
+
+
+  state.dpr =
+    dpr;
+
+
+  if($("densityText")){
+
+    $("densityText")
+      .textContent =
+      `Detected • ${width} × ${height} • ${dpr.toFixed(2)}x • ~${ppi} PPI`;
+
+  }
+
+
+  updateNext();
+
+}
+
+
+/* =========================================
+   UPDATE NEXT BUTTON
+========================================= */
+
+function updateNext(){
+
+  const brandNext =
+    $("brandNext");
+
+
+  if(brandNext){
+
+    brandNext.disabled =
+      !state.brand;
+
+  }
+
+
+  const deviceNext =
+    $("deviceNext");
+
+
+  if(deviceNext){
+
+    deviceNext.disabled =
+      !(
+        state.ram &&
+        state.storage &&
+        state.density
+      );
+
+  }
+
+}
+
+
+/* =========================================
+   OPEN VERIFICATION
+========================================= */
 
 function openVerification(){
 
   if(
-    !state.brand ||
     !state.ram ||
     !state.storage ||
     !state.density
   ){
+
     return;
+
   }
 
-  goTo("verification");
+
+  goTo(
+    "verification"
+  );
+
 }
 
 
-/* =========================
-   PAYMENT
-========================= */
+/* =========================================
+   OPEN PAYMENT
+========================================= */
 
 function openPayment(){
 
-  goTo("payment");
+  goTo(
+    "payment"
+  );
+
 }
 
 
-/* =========================
-   CONFIRMATION
-========================= */
+/* =========================================
+   OPEN CONFIRMATION
+========================================= */
 
 function openConfirmation(){
 
-  goTo("confirmation");
+  goTo(
+    "confirmation"
+  );
+
 }
 
 
-/* =========================
-   VERIFY CODE
-========================= */
+/* =========================================
+   UNIQUE DEVICE VERIFICATION
+========================================= */
 
 function verifyCode(){
 
   const input =
     $("verificationCode");
 
-  const code =
-    input
-      ? input.value.trim()
-      : "";
 
-  /*
-    TEMPORARY TEST CODE
-
-    IMPORTANT:
-    This is NOT secure for production
-    because frontend JS can be inspected.
-
-    Later this should be replaced with
-    Apps Script/backend verification.
-  */
-
-  const VALID_CODE =
-    "VIVEX29";
-
-  if(
-    code &&
-    code === VALID_CODE
-  ){
-
-    showResult();
-
+  if(!input){
+    return;
   }
-  else{
+
+
+  const code =
+    input.value
+      .trim()
+      .toUpperCase();
+
+
+  if(!code){
 
     showErrorPopup(
-      "Invalid verification code."
+      "Please enter your verification code."
     );
+
+    return;
+
   }
+
+
+  const deviceId =
+    getDeviceId();
+
+
+  showVerificationLoading();
+
+
+  verifyCodeWithServer(
+    code,
+    deviceId
+  );
+
 }
 
 
-/* =========================
+/* =========================================
+   GOOGLE APPS SCRIPT VERIFICATION
+========================================= */
+
+function verifyCodeWithServer(
+  code,
+  deviceId
+){
+
+  const callbackName =
+    "vivexCallback_" +
+    Date.now() +
+    "_" +
+    Math.floor(
+      Math.random() * 100000
+    );
+
+
+  let finished =
+    false;
+
+
+  const script =
+    document.createElement(
+      "script"
+    );
+
+
+  function cleanup(){
+
+    if(script.parentNode){
+
+      script.parentNode.removeChild(
+        script
+      );
+
+    }
+
+
+    try{
+
+      delete window[
+        callbackName
+      ];
+
+    }
+    catch(error){
+
+      window[
+        callbackName
+      ] = undefined;
+
+    }
+
+  }
+
+
+  const timeout =
+    setTimeout(
+      () => {
+
+        if(finished){
+          return;
+        }
+
+
+        finished = true;
+
+
+        cleanup();
+
+
+        hideVerificationLoading();
+
+
+        showErrorPopup(
+          "Verification server did not respond. Please try again."
+        );
+
+      },
+      15000
+    );
+
+
+  window[
+    callbackName
+  ] = function(result){
+
+    if(finished){
+      return;
+    }
+
+
+    finished = true;
+
+
+    clearTimeout(
+      timeout
+    );
+
+
+    cleanup();
+
+
+    hideVerificationLoading();
+
+
+    if(
+      result &&
+      result.success
+    ){
+
+      showResult();
+
+    }
+    else{
+
+      showErrorPopup(
+        result &&
+        result.message
+          ? result.message
+          : "Invalid verification code."
+      );
+
+    }
+
+  };
+
+
+  const url =
+    VERIFY_API +
+    "?code=" +
+    encodeURIComponent(code) +
+    "&device=" +
+    encodeURIComponent(deviceId) +
+    "&callback=" +
+    encodeURIComponent(
+      callbackName
+    );
+
+
+  script.src =
+    url;
+
+
+  script.onerror =
+    () => {
+
+      if(finished){
+        return;
+      }
+
+
+      finished = true;
+
+
+      clearTimeout(
+        timeout
+      );
+
+
+      cleanup();
+
+
+      hideVerificationLoading();
+
+
+      showErrorPopup(
+        "Unable to connect to verification server."
+      );
+
+    };
+
+
+  document.body.appendChild(
+    script
+  );
+
+}
+
+
+/* =========================================
+   VERIFICATION LOADING
+========================================= */
+
+function showVerificationLoading(){
+
+  const button =
+    document.querySelector(
+      '#verification .primary'
+    );
+
+
+  if(button){
+
+    button.disabled =
+      true;
+
+
+    button.dataset.oldText =
+      button.innerHTML;
+
+
+    button.innerHTML =
+      "Verifying...";
+
+  }
+
+}
+
+
+/* =========================================
+   HIDE VERIFICATION LOADING
+========================================= */
+
+function hideVerificationLoading(){
+
+  const button =
+    document.querySelector(
+      '#verification .primary'
+    );
+
+
+  if(button){
+
+    button.disabled =
+      false;
+
+
+    if(button.dataset.oldText){
+
+      button.innerHTML =
+        button.dataset.oldText;
+
+    }
+
+  }
+
+}
+
+
+/* =========================================
    ERROR POPUP
-========================= */
+========================================= */
 
 function showErrorPopup(
   message
 ){
 
+  const popup =
+    $("customPopup");
+
+
   const messageBox =
     $("popupMessage");
+
 
   if(messageBox){
 
     messageBox.textContent =
       message;
+
   }
 
-  const popup =
-    $("customPopup");
 
   if(popup){
 
     popup.classList.add(
       "show"
     );
+
   }
+
 }
 
+
+/* =========================================
+   CLOSE ERROR POPUP
+========================================= */
 
 function closeErrorPopup(){
 
   const popup =
     $("customPopup");
 
+
   if(popup){
 
     popup.classList.remove(
       "show"
     );
+
   }
+
 }
 
 
-/* =========================
-   SENSITIVITY CALCULATION
-========================= */
+/* =========================================
+   CLOSE POPUP ON BACKDROP
+========================================= */
 
-function calculateSensitivity(){
+document.addEventListener(
+  "click",
+  event => {
+
+    const popup =
+      $("customPopup");
+
+
+    if(
+      popup &&
+      event.target === popup
+    ){
+
+      closeErrorPopup();
+
+    }
+
+  }
+);
+
+
+/* =========================================
+   CALCULATE SETTINGS
+========================================= */
+
+function calculateSettings(){
 
   const ramEffect =
     getRamEffect(
       state.ram
     );
 
+
   const storageEffect =
     getStorageEffect(
       state.storage
     );
 
-  const device =
-    getDeviceFactor();
 
   const brandEffect =
     BRAND_FACTOR[
@@ -601,91 +930,212 @@ function calculateSensitivity(){
     ] || 0;
 
 
-  /*
-    Device/display contribution.
-    Kept controlled so RAM/storage
-    don't make the result unrealistic.
-  */
+  /* =====================================
+     RESOLUTION FACTOR
+  ===================================== */
 
-  const deviceEffect =
-      device.resolutionFactor
-    + device.ppiFactor
-    + device.dprFactor;
+  const resolution =
+    state.screenWidth *
+    state.screenHeight;
 
 
-  /*
-    Combined factor.
-  */
+  let resolutionFactor =
+    0;
+
+
+  if(
+    resolution >=
+    2400000
+  ){
+
+    resolutionFactor =
+      4;
+
+  }
+  else if(
+    resolution >=
+    1800000
+  ){
+
+    resolutionFactor =
+      3;
+
+  }
+  else if(
+    resolution >=
+    1400000
+  ){
+
+    resolutionFactor =
+      2;
+
+  }
+  else if(
+    resolution >=
+    900000
+  ){
+
+    resolutionFactor =
+      1;
+
+  }
+
+
+  /* =====================================
+     PPI FACTOR
+  ===================================== */
+
+  let ppiFactor =
+    0;
+
+
+  if(
+    state.density >=
+    500
+  ){
+
+    ppiFactor =
+      4;
+
+  }
+  else if(
+    state.density >=
+    420
+  ){
+
+    ppiFactor =
+      3;
+
+  }
+  else if(
+    state.density >=
+    350
+  ){
+
+    ppiFactor =
+      2;
+
+  }
+  else if(
+    state.density >=
+    280
+  ){
+
+    ppiFactor =
+      1;
+
+  }
+
+
+  /* =====================================
+     DPR FACTOR
+  ===================================== */
+
+  let dprFactor =
+    Math.round(
+      (state.dpr - 1) * 2
+    );
+
+
+  dprFactor =
+    Math.max(
+      0,
+      Math.min(
+        3,
+        dprFactor
+      )
+    );
+
+
+  /* =====================================
+     TOTAL FACTOR
+  ===================================== */
 
   const totalFactor =
-      ramEffect
-    + storageEffect
-    + deviceEffect
-    + brandEffect;
+    resolutionFactor +
+    ppiFactor +
+    dprFactor +
+    brandEffect +
+    ramEffect +
+    storageEffect;
 
 
-  /*
-    Base sensitivity.
-  */
+  /* =====================================
+     BASE SENSITIVITY
+  ===================================== */
 
   const base =
-    145 + totalFactor;
+    145 +
+    totalFactor;
 
 
   const settings = {
 
     general:
       clamp(
-        base + 15,
+        Math.round(
+          base + 15
+        ),
         100,
         200
       ),
 
     redDot:
       clamp(
-        base + 8,
+        Math.round(
+          base + 8
+        ),
         90,
         195
       ),
 
-    scope2x:
+    twoX:
       clamp(
-        base,
+        Math.round(
+          base
+        ),
         80,
         190
       ),
 
-    scope4x:
+    fourX:
       clamp(
-        base - 12,
+        Math.round(
+          base - 12
+        ),
         70,
         180
       ),
 
     sniper:
       clamp(
-        base - 45,
+        Math.round(
+          base - 45
+        ),
         40,
         140
       ),
 
     freeLook:
       clamp(
-        base + 4,
+        Math.round(
+          base + 4
+        ),
         90,
         195
       )
+
   };
 
 
-  /*
-    Fire button.
-  */
+  /* =====================================
+     FIRE BUTTON
+  ===================================== */
 
   const fireButton =
     clamp(
-      48 +
       Math.round(
+        48 +
         totalFactor / 2
       ),
       45,
@@ -693,283 +1143,94 @@ function calculateSensitivity(){
     );
 
 
-  return {
-    settings,
-    fireButton,
-    totalFactor
-  };
-}
-
-
-/* =========================
-   DPI CALCULATION
-========================= */
-
-function calculateRecommendedDPI(){
+  /* =====================================
+     RECOMMENDED DPI
+     FIXED PPI RELATIONSHIP
+  ===================================== */
 
   /*
-    IMPORTANT:
-
-    This is a RECOMMENDED GAMING DPI,
-    NOT a claim of the phone's actual
-    Android system DPI.
-
-    Browser cannot reliably read the
-    Android system DPI.
-
-    Intended relationship:
-
-    LOWER PPI  → HIGHER DPI
-    HIGHER PPI → LOWER DPI
-  */
-
+   * IMPORTANT:
+   *
+   * Browser cannot read the real Android
+   * system DPI reliably.
+   *
+   * The value below is therefore a
+   * RECOMMENDED GAMING DPI, not a claim
+   * that this is the phone's actual DPI.
+   *
+   * Higher estimated PPI = lower
+   * recommended gaming DPI.
+   *
+   * Approximate anchors:
+   *
+   * 273 PPI -> 500 DPI
+   * 320 PPI -> 465 DPI
+   * 350 PPI -> 442 DPI
+   * 373 PPI -> 425 DPI
+   * 400 PPI -> 405 DPI
+   *
+   * RAM / storage / brand adjustments
+   * are intentionally kept very small so
+   * they cannot overpower the PPI effect.
+   */
 
   const ppi =
     state.density || 320;
 
 
-  /*
-    Main inverse PPI relationship.
-
-    Reference:
-    273 PPI → around 500
-    373 PPI → around 425
-
-    Difference of 100 PPI produces
-    approximately 75 DPI difference.
-  */
-
   let dpi =
     500 -
     (
-      (ppi - 273) * 0.75
-    );
+      ppi -
+      273
+    ) * 0.75;
 
 
   /*
-    Small hardware adjustments.
+   * Small device adjustments.
+   * These do NOT reverse the PPI relationship.
+   */
 
-    These are deliberately weak so that
-    PPI remains the main DPI factor.
-  */
+  dpi +=
+    brandEffect * 1;
 
-  const device =
-    getDeviceFactor();
 
-  const ramEffect =
-    getRamEffect(
-      state.ram
-    );
+  dpi +=
+    ramEffect * 0.5;
 
-  const storageEffect =
-    getStorageEffect(
-      state.storage
-    );
 
-  const brandEffect =
-    BRAND_FACTOR[
-      state.brand
-    ] || 0;
+  dpi +=
+    storageEffect * 0.25;
 
 
   /*
-    Small adjustments only.
-  */
-
-  dpi +=
-    device.resolutionFactor * 0.8;
-
-  dpi +=
-    device.dprFactor * 0.5;
-
-  dpi +=
-    ramEffect * 0.6;
-
-  dpi +=
-    storageEffect * 0.3;
-
-  dpi +=
-    brandEffect * 0.4;
-
-
-  /*
-    Keep recommended DPI in a
-    practical gaming range.
-
-    Minimum 400 as requested.
-  */
+   * Recommended gaming DPI:
+   * minimum 400
+   * maximum 550
+   */
 
   dpi =
-    Math.round(
-      clamp(
-        dpi,
-        400,
-        550
-      )
+    clamp(
+      Math.round(dpi),
+      400,
+      550
     );
 
 
-  return dpi;
+  return {
+
+    settings,
+    fireButton,
+    dpi
+
+  };
+
 }
 
 
-/* =========================
-   SHOW RESULT
-========================= */
-
-function showResult(){
-
-  /*
-    Brand
-  */
-
-  const resultBrand =
-    $("resultBrand");
-
-  if(resultBrand){
-
-    resultBrand.textContent =
-      state.brand;
-  }
-
-
-  /*
-    RAM
-  */
-
-  const resultRam =
-    $("resultRam");
-
-  if(resultRam){
-
-    resultRam.textContent =
-      state.ram;
-  }
-
-
-  /*
-    Storage
-  */
-
-  const resultStorage =
-    $("resultStorage");
-
-  if(resultStorage){
-
-    resultStorage.textContent =
-      state.storage;
-  }
-
-
-  /*
-    PPI
-  */
-
-  const resultDensity =
-    $("resultDensity");
-
-  if(resultDensity){
-
-    resultDensity.textContent =
-      `~${state.density} PPI`;
-  }
-
-
-  /*
-    Calculate sensitivity.
-  */
-
-  const result =
-    calculateSensitivity();
-
-  const settings =
-    result.settings;
-
-
-  /*
-    Settings cards.
-  */
-
-  const settingsGrid =
-    $("settingsGrid");
-
-  if(settingsGrid){
-
-    settingsGrid.innerHTML = `
-
-      <div class="setting-card">
-        <small>GENERAL</small>
-        <strong>${settings.general}</strong>
-      </div>
-
-      <div class="setting-card">
-        <small>RED DOT</small>
-        <strong>${settings.redDot}</strong>
-      </div>
-
-      <div class="setting-card">
-        <small>2X SCOPE</small>
-        <strong>${settings.scope2x}</strong>
-      </div>
-
-      <div class="setting-card">
-        <small>4X SCOPE</small>
-        <strong>${settings.scope4x}</strong>
-      </div>
-
-      <div class="setting-card">
-        <small>SNIPER SCOPE</small>
-        <strong>${settings.sniper}</strong>
-      </div>
-
-      <div class="setting-card">
-        <small>FREE LOOK</small>
-        <strong>${settings.freeLook}</strong>
-      </div>
-
-    `;
-  }
-
-
-  /*
-    Fire button.
-  */
-
-  const fireButton =
-    $("fireButton");
-
-  if(fireButton){
-
-    fireButton.textContent =
-      `${result.fireButton}%`;
-  }
-
-
-  /*
-    Recommended DPI.
-  */
-
-  const dpi =
-    $("dpi");
-
-  if(dpi){
-
-    dpi.textContent =
-      calculateRecommendedDPI();
-  }
-
-
-  /*
-    Finally show result.
-  */
-
-  goTo("result");
-}
-
-
-/* =========================
+/* =========================================
    CLAMP
-========================= */
+========================================= */
 
 function clamp(
   value,
@@ -977,188 +1238,267 @@ function clamp(
   max
 ){
 
-  return Math.min(
-    Math.max(
-      value,
-      min
-    ),
-    max
+  return Math.max(
+    min,
+    Math.min(
+      max,
+      value
+    )
   );
+
 }
 
 
-/* =========================
+/* =========================================
+   SHOW RESULT
+========================================= */
+
+function showResult(){
+
+  const result =
+    calculateSettings();
+
+
+  if($("resultBrand")){
+
+    $("resultBrand")
+      .textContent =
+      state.brand;
+
+  }
+
+
+  if($("resultRam")){
+
+    $("resultRam")
+      .textContent =
+      state.ram;
+
+  }
+
+
+  if($("resultStorage")){
+
+    $("resultStorage")
+      .textContent =
+      state.storage;
+
+  }
+
+
+  if($("resultDensity")){
+
+    $("resultDensity")
+      .textContent =
+      "~" +
+      state.density +
+      " PPI";
+
+  }
+
+
+  const settingsGrid =
+    $("settingsGrid");
+
+
+  if(settingsGrid){
+
+    settingsGrid.innerHTML = `
+
+      <div class="setting-card">
+        <small>GENERAL</small>
+        <strong>
+          ${result.settings.general}
+        </strong>
+      </div>
+
+      <div class="setting-card">
+        <small>RED DOT</small>
+        <strong>
+          ${result.settings.redDot}
+        </strong>
+      </div>
+
+      <div class="setting-card">
+        <small>2X SCOPE</small>
+        <strong>
+          ${result.settings.twoX}
+        </strong>
+      </div>
+
+      <div class="setting-card">
+        <small>4X SCOPE</small>
+        <strong>
+          ${result.settings.fourX}
+        </strong>
+      </div>
+
+      <div class="setting-card">
+        <small>SNIPER</small>
+        <strong>
+          ${result.settings.sniper}
+        </strong>
+      </div>
+
+      <div class="setting-card">
+        <small>FREE LOOK</small>
+        <strong>
+          ${result.settings.freeLook}
+        </strong>
+      </div>
+
+    `;
+
+  }
+
+
+  if($("fireButton")){
+
+    $("fireButton")
+      .textContent =
+      result.fireButton +
+      "%";
+
+  }
+
+
+  if($("dpi")){
+
+    $("dpi")
+      .textContent =
+      result.dpi;
+
+  }
+
+
+  goTo(
+    "result"
+  );
+
+}
+
+
+/* =========================================
    RESTART
-========================= */
+========================================= */
 
 function restart(){
 
   state.brand = "";
   state.ram = "";
   state.storage = "";
+
   state.density = 0;
+
   state.screenWidth = 0;
   state.screenHeight = 0;
+
   state.dpr = 1;
 
 
-  /*
-    Reset brand cards.
-  */
-
   document
-    .querySelectorAll(".brand-card")
-    .forEach(card => {
+    .querySelectorAll(
+      ".brand-btn"
+    )
+    .forEach(btn => {
 
-      card.classList.remove(
+      btn.classList.remove(
         "selected"
       );
+
     });
 
 
-  /*
-    Reset selects.
-  */
+  if($("ramSelect")){
 
-  const ram =
-    $("ramSelect");
+    $("ramSelect")
+      .value = "";
 
-  if(ram){
-    ram.value = "";
   }
 
 
-  const storage =
-    $("storageSelect");
+  if($("storageSelect")){
 
-  if(storage){
-    storage.value = "";
+    $("storageSelect")
+      .value = "";
+
   }
 
 
-  /*
-    Reset scan text.
-  */
+  if($("densityText")){
 
-  const densityText =
-    $("densityText");
-
-  if(densityText){
-
-    densityText.textContent =
+    $("densityText")
+      .textContent =
       "Not scanned yet";
+
   }
 
 
-  /*
-    Reset selected brand.
-  */
+  if($("verificationCode")){
 
-  const selectedBrand =
-    $("selectedBrand");
+    $("verificationCode")
+      .value = "";
 
-  if(selectedBrand){
-
-    selectedBrand.textContent =
-      "Brand";
-  }
-
-
-  /*
-    Reset verification field.
-  */
-
-  const verificationCode =
-    $("verificationCode");
-
-  if(verificationCode){
-
-    verificationCode.value =
-      "";
   }
 
 
   updateNext();
 
-  goTo("home");
+
+  goTo(
+    "home"
+  );
+
 }
 
 
-/* =========================
-   SELECT CHANGE LISTENERS
-========================= */
+/* =========================================
+   ENTER KEY FOR VERIFICATION
+========================================= */
 
 document.addEventListener(
   "DOMContentLoaded",
   () => {
 
-    initBrands();
-
-
-    const ram =
-      $("ramSelect");
-
-    if(ram){
-
-      ram.addEventListener(
-        "change",
-        () => {
-
-          state.ram =
-            ram.value;
-
-          updateNext();
-        }
-      );
-    }
-
-
-    const storage =
-      $("storageSelect");
-
-    if(storage){
-
-      storage.addEventListener(
-        "change",
-        () => {
-
-          state.storage =
-            storage.value;
-
-          updateNext();
-        }
-      );
-    }
-
-
-    /*
-      Initial button state.
-    */
-
-    updateNext();
-
-
-    /*
-      Enter key on verification.
-    */
-
-    const verificationCode =
+    const input =
       $("verificationCode");
 
-    if(verificationCode){
 
-      verificationCode.addEventListener(
+    if(input){
+
+      input.addEventListener(
         "keydown",
         event => {
 
           if(
-            event.key === "Enter"
+            event.key ===
+            "Enter"
           ){
 
             verifyCode();
+
           }
+
         }
       );
+
     }
+
+  }
+);
+
+
+/* =========================================
+   START APP
+========================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    getDeviceId();
+
+    init();
+
   }
 );
