@@ -1,6 +1,6 @@
-/* ================================
+/* =================================
    MOBILE ONLY CHECK
-================================ */
+================================= */
 
 function isMobileDevice(){
 
@@ -9,6 +9,7 @@ function isMobileDevice(){
     navigator.vendor ||
     window.opera;
 
+
   return /android|iphone|ipad|ipod|mobile/i.test(
     userAgent
   );
@@ -16,12 +17,9 @@ function isMobileDevice(){
 }
 
 
-/* ================================
-   BLOCK DESKTOP
-================================ */
-
 const IS_MOBILE =
   isMobileDevice();
+
 
 
 if(!IS_MOBILE){
@@ -35,12 +33,14 @@ if(!IS_MOBILE){
           "desktopBlock"
         );
 
+
       if(block){
 
         block.style.display =
           "flex";
 
       }
+
 
       document.body.style.overflow =
         "hidden";
@@ -51,133 +51,127 @@ if(!IS_MOBILE){
 }
 
 
-/* ================================
+/* =================================
    STATE
-================================ */
+================================= */
 
 const state = {
 
-  brand: "",
+  brand:"",
+  ram:"",
+  storage:"",
 
-  ram: "",
+  density:0,
 
-  storage: "",
+  screenWidth:0,
+  screenHeight:0,
 
-  density: 0,
-
-  screenWidth: 0,
-
-  screenHeight: 0,
-
-  dpr: 1
+  dpr:1
 
 };
 
 
-/* ================================
-   HELPERS
-================================ */
+/* =================================
+   HELPER
+================================= */
 
 const $ = (id) =>
   document.getElementById(id);
 
 
-/* ================================
+/* =================================
    PHONE BRANDS
-================================ */
+================================= */
 
 const BRANDS = [
 
   "Samsung",
-
   "Realme",
-
   "Vivo",
-
   "OPPO",
-
   "Xiaomi",
-
   "OnePlus",
-
   "Motorola",
-
   "Infinix",
-
   "Tecno",
-
   "iQOO",
-
   "Apple",
-
   "POCO",
-
   "Nothing",
-
   "Honor",
-
   "Google Pixel"
 
 ];
 
 
-/* ================================
+/* =================================
    BRAND TUNING
-================================ */
+================================= */
 
 const BRAND_FACTOR = {
 
-  "Samsung": 0,
+  "Samsung":0,
 
-  "Realme": 2,
+  "Realme":2,
 
-  "Vivo": 2,
+  "Vivo":2,
 
-  "OPPO": 1,
+  "OPPO":1,
 
-  "Xiaomi": 3,
+  "Xiaomi":3,
 
-  "OnePlus": 4,
+  "OnePlus":4,
 
-  "Motorola": 0,
+  "Motorola":0,
 
-  "Infinix": 3,
+  "Infinix":3,
 
-  "Tecno": 3,
+  "Tecno":3,
 
-  "iQOO": 5,
+  "iQOO":5,
 
-  "Apple": -3,
+  "Apple":-3,
 
-  "POCO": 4,
+  "POCO":4,
 
-  "Nothing": 1,
+  "Nothing":1,
 
-  "Honor": 1,
+  "Honor":1,
 
-  "Google Pixel": -2
+  "Google Pixel":-2
 
 };
 
 
-/* ================================
+/* =================================
    NAVIGATION
-================================ */
+================================= */
 
 function goTo(id){
 
   document
     .querySelectorAll(".screen")
-    .forEach((screen) => {
+    .forEach(
+      (screen) => {
 
-      screen.classList.remove(
-        "active"
-      );
+        screen.classList.remove(
+          "active"
+        );
 
-    });
+      }
+    );
 
 
-  $(id).classList.add(
+  const target =
+    $(id);
+
+
+  if(!target){
+    return;
+  }
+
+
+  target.classList.add(
     "active"
   );
 
@@ -193,35 +187,45 @@ function goTo(id){
 }
 
 
-/* ================================
+/* =================================
    LOAD BRANDS
-================================ */
+================================= */
 
 function init(){
 
-  $("brandGrid").innerHTML =
+  const brandGrid =
+    $("brandGrid");
 
+
+  if(!brandGrid){
+    return;
+  }
+
+
+  brandGrid.innerHTML =
     BRANDS
-      .map((brand) => `
+      .map(
+        (brand) => `
 
-        <button
-          class="brand"
-          onclick="selectBrand('${brand}', this)"
-        >
+          <button
+            class="brand"
+            onclick="selectBrand('${brand}', this)"
+          >
 
-          ${brand}
+            ${brand}
 
-        </button>
+          </button>
 
-      `)
+        `
+      )
       .join("");
 
 }
 
 
-/* ================================
+/* =================================
    SELECT BRAND
-================================ */
+================================= */
 
 function selectBrand(
   brand,
@@ -238,13 +242,15 @@ function selectBrand(
 
   document
     .querySelectorAll(".brand")
-    .forEach((item) => {
+    .forEach(
+      (item) => {
 
-      item.classList.remove(
-        "selected"
-      );
+        item.classList.remove(
+          "selected"
+        );
 
-    });
+      }
+    );
 
 
   element.classList.add(
@@ -254,13 +260,14 @@ function selectBrand(
 }
 
 
-/* ================================
+/* =================================
    DEVICE PAGE
-================================ */
+================================= */
 
 function openDeviceStep(){
 
-  $("selectedBrand").textContent =
+  $("selectedBrand")
+    .textContent =
     state.brand;
 
 
@@ -290,7 +297,8 @@ function openDeviceStep(){
     1;
 
 
-  $("densityText").textContent =
+  $("densityText")
+    .textContent =
     "Not scanned yet";
 
 
@@ -303,9 +311,9 @@ function openDeviceStep(){
 }
 
 
-/* ================================
+/* =================================
    SCREEN / DENSITY SCAN
-================================ */
+================================= */
 
 function scanDensity(){
 
@@ -336,6 +344,7 @@ function scanDensity(){
     estimated PPI.
   */
 
+
   const ppi =
     Math.round(
       160 * dpr
@@ -345,21 +354,18 @@ function scanDensity(){
   state.density =
     ppi;
 
-
   state.screenWidth =
     width;
 
-
   state.screenHeight =
     height;
-
 
   state.dpr =
     dpr;
 
 
-  $("densityText").textContent =
-
+  $("densityText")
+    .textContent =
     `Detected • ${width} × ${height} • ${dpr.toFixed(2)}x • ~${ppi} PPI`;
 
 
@@ -368,38 +374,129 @@ function scanDensity(){
 }
 
 
-/* ================================
-   CHECK DEVICE BUTTON
-================================ */
+/* =================================
+   DEVICE BUTTON
+================================= */
 
 function updateNext(){
 
-  $("deviceNext").disabled = !(
-    state.ram &&
-    state.storage &&
-    state.density
+  $("deviceNext").disabled =
+    !(
+      state.ram &&
+      state.storage &&
+      state.density
+    );
+
+}
+
+
+/* =================================
+   OPEN VERIFICATION
+================================= */
+
+function openVerification(){
+
+  goTo(
+    "verification"
   );
 
 }
 
 
-/* ================================
+/* =================================
+   OPEN PAYMENT
+================================= */
+
+function openPayment(){
+
+  goTo(
+    "payment"
+  );
+
+}
+
+
+/* =================================
+   PAYMENT CONFIRMATION
+================================= */
+
+function openConfirmation(){
+
+  goTo(
+    "confirmation"
+  );
+
+}
+
+
+/* =================================
+   TEMPORARY VERIFICATION
+================================= */
+
+function verifyCode(){
+
+  const code =
+    $("verificationCode")
+      .value
+      .trim();
+
+
+  /*
+    TEMPORARY TEST CODE
+
+    IMPORTANT:
+
+    Ye sirf testing ke liye hai.
+
+    Baad me Google Sheet /
+    Apps Script verification
+    se replace karenge.
+  */
+
+
+  const VALID_CODE =
+    "VIVEX29";
+
+
+  if(
+    code === VALID_CODE
+  ){
+
+    showResult();
+
+  }
+
+  else{
+
+    alert(
+      "Invalid verification code."
+    );
+
+  }
+
+}
+
+
+/* =================================
    RAM
-================================ */
+================================= */
 
 function getRam(){
 
   return (
-    parseInt(state.ram) ||
-    4
+
+    parseInt(
+      state.ram
+    ) || 4
+
   );
 
 }
 
 
-/* ================================
+/* =================================
    STORAGE
-================================ */
+================================= */
 
 function getStorage(){
 
@@ -411,7 +508,9 @@ function getStorage(){
 
 
   if(
-    state.storage.includes("TB")
+    state.storage.includes(
+      "TB"
+    )
   ){
 
     const tb =
@@ -426,17 +525,19 @@ function getStorage(){
 
 
   return (
+
     parseInt(
       state.storage
     ) || 64
+
   );
 
 }
 
 
-/* ================================
+/* =================================
    RAM EFFECT
-================================ */
+================================= */
 
 function getRamEffect(ram){
 
@@ -480,9 +581,9 @@ function getRamEffect(ram){
 }
 
 
-/* ================================
+/* =================================
    STORAGE EFFECT
-================================ */
+================================= */
 
 function getStorageEffect(
   storage
@@ -528,9 +629,9 @@ function getStorageEffect(
 }
 
 
-/* ================================
+/* =================================
    DEVICE PROFILE
-================================ */
+================================= */
 
 function getDeviceProfile(){
 
@@ -543,11 +644,13 @@ function getDeviceProfile(){
 
 
   const ppi =
-    state.density || 320;
+    state.density ||
+    320;
 
 
   const dpr =
-    state.dpr || 1;
+    state.dpr ||
+    1;
 
 
   const ramEffect =
@@ -671,49 +774,35 @@ function getDeviceProfile(){
 
 
   const deviceFactor =
-
     resolutionFactor +
-
     ppiFactor +
-
     dprFactor +
-
     brandFactor;
 
 
   const totalFactor =
-
     deviceFactor +
-
     ramEffect +
-
     storageEffect;
 
 
   return {
 
     ram,
-
     storage,
-
     ppi,
-
     dpr,
 
     ramEffect,
-
     storageEffect,
 
     resolutionFactor,
-
     ppiFactor,
-
     dprFactor,
 
     brandFactor,
 
     deviceFactor,
-
     totalFactor
 
   };
@@ -721,9 +810,9 @@ function getDeviceProfile(){
 }
 
 
-/* ================================
+/* =================================
    GENERATE SENSITIVITY
-================================ */
+================================= */
 
 function generateSensitivity(){
 
@@ -787,15 +876,10 @@ function generateSensitivity(){
   return {
 
     general,
-
     redDot,
-
     scope2x,
-
     scope4x,
-
     sniper,
-
     freeLook
 
   };
@@ -803,9 +887,9 @@ function generateSensitivity(){
 }
 
 
-/* ================================
+/* =================================
    CLAMP
-================================ */
+================================= */
 
 function clamp(
   value,
@@ -814,22 +898,19 @@ function clamp(
 ){
 
   return Math.max(
-
     min,
-
     Math.min(
       max,
       value
     )
-
   );
 
 }
 
 
-/* ================================
+/* =================================
    SHOW RESULT
-================================ */
+================================= */
 
 function showResult(){
 
@@ -841,19 +922,23 @@ function showResult(){
     generateSensitivity();
 
 
-  $("resultBrand").textContent =
+  $("resultBrand")
+    .textContent =
     state.brand;
 
 
-  $("resultRam").textContent =
+  $("resultRam")
+    .textContent =
     state.ram;
 
 
-  $("resultStorage").textContent =
+  $("resultStorage")
+    .textContent =
     state.storage;
 
 
-  $("resultDensity").textContent =
+  $("resultDensity")
+    .textContent =
     `~${profile.ppi} PPI`;
 
 
@@ -892,7 +977,8 @@ function showResult(){
   ];
 
 
-  $("settingsGrid").innerHTML =
+  $("settingsGrid")
+    .innerHTML =
 
     settings
       .map(
@@ -916,11 +1002,10 @@ function showResult(){
 
 
   let fireButton =
-
     48 +
-
     Math.round(
-      profile.totalFactor / 2
+      profile.totalFactor /
+      2
     );
 
 
@@ -932,7 +1017,8 @@ function showResult(){
     );
 
 
-  $("fireButton").textContent =
+  $("fireButton")
+    .textContent =
     `${fireButton}%`;
 
 
@@ -944,11 +1030,14 @@ function showResult(){
       profile.ppi - 320
     ) * 1.2 +
 
-    profile.deviceFactor * 5 +
+    profile.deviceFactor *
+    5 +
 
-    profile.ramEffect * 3 +
+    profile.ramEffect *
+    3 +
 
-    profile.storageEffect * 2;
+    profile.storageEffect *
+    2;
 
 
   recommendedDpi =
@@ -965,7 +1054,8 @@ function showResult(){
     );
 
 
-  $("dpi").textContent =
+  $("dpi")
+    .textContent =
     recommendedDpi;
 
 
@@ -974,9 +1064,9 @@ function showResult(){
 }
 
 
-/* ================================
+/* =================================
    RESTART
-================================ */
+================================= */
 
 function restart(){
 
@@ -1008,13 +1098,20 @@ function restart(){
 
   document
     .querySelectorAll(".brand")
-    .forEach((item) => {
+    .forEach(
+      (item) => {
 
-      item.classList.remove(
-        "selected"
-      );
+        item.classList.remove(
+          "selected"
+        );
 
-    });
+      }
+    );
+
+
+  $("verificationCode")
+    .value =
+    "";
 
 
   goTo("home");
@@ -1022,9 +1119,9 @@ function restart(){
 }
 
 
-/* ================================
+/* =================================
    START APP
-================================ */
+================================= */
 
 if(IS_MOBILE){
 
