@@ -73,7 +73,15 @@ a{
   margin:0 auto;
   padding:28px 26px 35px;
   position:relative;
-  overflow:hidden;
+  overflow-x:hidden;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+
+.screen::-webkit-scrollbar{
+  width:0;
+  display:none;
 }
 
 .screen.active{
