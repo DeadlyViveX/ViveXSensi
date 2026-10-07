@@ -1133,14 +1133,14 @@ function calculateSettings(){
   ===================================== */
 
   const fireButton =
-    clamp(
-      Math.round(
-        48 +
-        totalFactor / 2
-      ),
-      45,
-      55
-    );
+  clamp(
+    Math.round(
+      38 +
+      totalFactor / 2
+    ),
+    33,
+    43
+  );
 
 
   /* =====================================
