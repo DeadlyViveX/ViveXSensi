@@ -1,0 +1,8 @@
+[{
+"relation": ["delegate_permission/common.handle_all_urls"],
+"target": {
+"namespace": "android_app",
+"package_name": "io.github.vivexhere.twa",
+"sha256_cert_fingerprints": ["B0:34:DE:58:BD:7A:95:4F:6A:13:45:97:FF:85:3D:35:68:2E:B8:52:11:54:FF:73:C3:CE:2D:01:8E:4E:65:81"]
+}
+}]
