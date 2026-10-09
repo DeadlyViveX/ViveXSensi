@@ -1,0 +1,12 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "ViveXsensi",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "SensiBOT",
+  "start_url": "/",
+  "theme_color": "#080808",
+  "id": "com.vivexhere.sensi"
+}
