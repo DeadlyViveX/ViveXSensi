@@ -1,0 +1,14 @@
+{
+  "background_color": "#000000",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "ViveXsensi",
+  "orientation": "portrait",
+  "scope": "https://vivexhere.github.io/ViveXSensi/",
+  "short_name": "SensiBOT",
+  "start_url": "https://vivexhere.github.io/ViveXSensi/",
+  "theme_color": "#ff0000",
+  "id": "com.vivexhere.sensi",
+  "description": "Device-specific Free Fire sensitivity, fire button size, and DPI recommendations for your phone.",
+  "lang": "en"
+}
